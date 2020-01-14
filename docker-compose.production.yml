@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  exrx-net-crawler:
+    container_name: exrx-net-crawler
+    image: "ijohnnymiller/exrx-net-crawler-prod:${TAG}"
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        ENV: production
+        ENV_ALIAS: prod
+    ports:
+      - 8081:80
+    volumes:
+      - /Users/johnny/docker-file-mapping/exrx-net-crawler/log:/var/log/nginx
