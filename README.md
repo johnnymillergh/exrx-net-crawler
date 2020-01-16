@@ -1,18 +1,18 @@
 ![ExRx Net Crawler Feature Graphics](https://raw.githubusercontent.com/johnnymillergh/MaterialLibrary/master/exrx-net-crawler/exrx-net-crawler-social-image.png)
 
-[![GitHub release](https://img.shields.io/github/release/johnnymillergh/vuetify-typescript-playground.svg)](https://github.com/johnnymillergh/vuetify-typescript-playground/releases)
-[![Build Status](https://travis-ci.com/johnnymillergh/vuetify-typescript-playground.svg?branch=master)](https://travis-ci.com/johnnymillergh/typescript-playground)
-[![GitHub issues](https://img.shields.io/github/issues/johnnymillergh/vuetify-typescript-playground)](https://github.com/johnnymillergh/vuetify-typescript-playground/issues)
-[![GitHub forks](https://img.shields.io/github/forks/johnnymillergh/vuetiify-typescript-playground)](https://github.com/johnnymillergh/vuetify-typescript-playground/network)
-[![GitHub stars](https://img.shields.io/github/stars/johnnymillergh/vuetiify-typescript-playground)](https://github.com/johnnymillergh/vuetify-typescript-playground/stargazers)
-[![GitHub license](https://img.shields.io/github/license/johnnymillergh/vuetiify-typescript-playground)](https://github.com/johnnymillergh/vuetify-typescript-playground/blob/master/LICENSE)
-[![Twitter](https://img.shields.io/twitter/url/https/github.com/johnnymillergh/vuetiify-typescript-playground?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fjohnnymillergh%2Fvuetify-typescript-playground)
+[![GitHub release](https://img.shields.io/github/release/johnnymillergh/exrx-net-crawler.svg)](https://github.com/johnnymillergh/exrx-net-crawler/releases)
+[![Build Status](https://travis-ci.com/johnnymillergh/exrx-net-crawler.svg?branch=master)](https://travis-ci.com/johnnymillergh/typescript-playground)
+[![GitHub issues](https://img.shields.io/github/issues/johnnymillergh/exrx-net-crawler)](https://github.com/johnnymillergh/exrx-net-crawler/issues)
+[![GitHub forks](https://img.shields.io/github/forks/johnnymillergh/exrx-net-crawler)](https://github.com/johnnymillergh/exrx-net-crawler/network)
+[![GitHub stars](https://img.shields.io/github/stars/johnnymillergh/exrx-net-crawler)](https://github.com/johnnymillergh/exrx-net-crawler/stargazers)
+[![GitHub license](https://img.shields.io/github/license/johnnymillergh/exrx-net-crawler)](https://github.com/johnnymillergh/exrx-net-crawler/blob/master/LICENSE)
+[![Twitter](https://img.shields.io/twitter/url/https/github.com/johnnymillergh/exrx-net-crawler?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fjohnnymillergh%2Fexrx-net-crawler)
 
 # ExRx.net Crawler
 
 **ExRx.net Crawler** is a Vuetify tutorial project based on TypeScript.
 
-[Official Docker Image](https://hub.docker.com/r/ijohnnymiller/vuetify-typescript-playground-prod)
+[Official Docker Image](https://hub.docker.com/r/ijohnnymiller/exrx-net-crawler-prod)
 
 ## Features
 
