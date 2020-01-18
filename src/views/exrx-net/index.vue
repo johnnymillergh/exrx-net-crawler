@@ -12,6 +12,12 @@
             Save Body Part
           </v-btn>
         </v-row>
+        <v-row>Muscle: {{ muscleList }}</v-row>
+        <v-row>
+          <v-btn v-debounced-click="handleClickMuscleList" :loading="loadingMuscle" color="primary">
+            Save Body Part
+          </v-btn>
+        </v-row>
       </div>
     </v-card>
   </v-app>
@@ -31,16 +37,33 @@ export default Vue.extend({
     loadingContent: false,
     mergedMuscleUnorderedList: {} as Cheerio,
     bodyPartList: [] as string[],
-    loadingSaveBodyPart: false
+    loadingSaveBodyPart: false,
+    loadingMuscle: false,
+    muscleList: [] as string[]
   }),
   methods: {
-    readMuscle (): void {
+    readBodyPart (): void {
       console.debug('this.mergedMuscleUnorderedList.children()', this.mergedMuscleUnorderedList.children())
       this.bodyPartList = DomUtil.getFirstLevelTextArray(this.mergedMuscleUnorderedList.children())
     },
-    async handleClickSaveBodyPart () {
+    async getMuscleList (): Promise<any> {
+      const response = await exrxNetApi.muscleList()
+      const cheerioInstance = cheerio.load(response)
+      const cheerio1 = cheerioInstance('.col-sm-6').find('li')
+      this.muscleList = DomUtil.getFirstLevelTextArray(cheerio1)
+      // Iterate list to compensate lost muscle data
+      cheerio1.each((index, element) => {
+        const trimmedMuscleItem = element.firstChild.data?.trim()
+        if (trimmedMuscleItem) {
+          this.muscleList[index] = trimmedMuscleItem
+        }
+      })
+      console.info('muscleList', this.muscleList)
+    },
+    async handleClickSaveBodyPart (): Promise<void> {
       if (!this.bodyPartList.length) {
-        return this.$toast.warning('Invalid data!')
+        this.$toast.warning('Invalid data!')
+        return
       }
       this.loadingSaveBodyPart = true
       const saveBodyPartPayload = new SaveBodyPartPayload()
@@ -53,16 +76,24 @@ export default Vue.extend({
       } finally {
         this.loadingSaveBodyPart = false
       }
+    },
+    async handleClickMuscleList (): Promise<void> {
+      if (!this.muscleList.length) {
+        this.$toast.warning('Invalid data!')
+        return
+      }
+      this.loadingMuscle = true
     }
   },
   async mounted () {
     this.loadingContent = true
+    this.getMuscleList()
     try {
       const response = await exrxNetApi.exerciseDirectory()
       this.$toast.success('Succeed to getFirstText extercise directory.')
       const cheerioInstance = cheerio.load(response)
       this.mergedMuscleUnorderedList = DomUtil.mergeSameLevelUnorderedList(cheerioInstance('.col-sm-6').find('div > ul'))
-      this.readMuscle()
+      this.readBodyPart()
     } catch (error) {
       console.error('Error occurred when sending request `exerciseDirectory`!', error)
       this.$toast.error('Error occurred when sending request `exerciseDirectory`!')
