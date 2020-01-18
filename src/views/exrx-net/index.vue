@@ -17,6 +17,7 @@
           <v-btn v-debounced-click="handleClickSaveMuscleList" :loading="loadingMuscle" color="primary">Save Muscle
           </v-btn>
         </v-row>
+        {{ muscleLinkList }}
       </div>
     </v-card>
   </v-app>
@@ -32,6 +33,7 @@ import { SaveBodyPartPayload } from '@/domain/body-part/save-body-part-payload'
 import { SaveMusclePayload } from '@/domain/muscle/save-muscle-payload'
 import { MusclePayload } from '@/domain/muscle/muscle-payload'
 import { muscleApi } from '@/requests/muscle-api'
+import { MuscleLink } from '@/domain/muscle/muscle-link'
 
 export default Vue.extend({
   name: 'exrx-net',
@@ -41,7 +43,8 @@ export default Vue.extend({
     bodyPartList: [] as string[],
     loadingSaveBodyPart: false,
     loadingMuscle: false,
-    muscleList: [] as string[]
+    muscleList: [] as string[],
+    muscleLinkList: [] as Array<MuscleLink>
   }),
   methods: {
     async getAndParseBodyPart (): Promise<any> {
@@ -68,6 +71,13 @@ export default Vue.extend({
           if (trimmedMuscleItem) {
             this.muscleList[index] = trimmedMuscleItem
           }
+          const muscleLink = cheerio.load(element)('a')
+          const ml = new MuscleLink()
+          ml.name = this.muscleList[index]
+          if (muscleLink.length === 1) {
+            ml.link = muscleLink[0].attribs.href
+          }
+          this.muscleLinkList.push(ml)
         })
       } catch (error) {
         console.error('Error occurred when sending request `exerciseDirectory`!', error)
