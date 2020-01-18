@@ -26,8 +26,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AppUtil } from '@/utils/app-util'
-import { GetByIdPayload } from '@/requests/test-table/payload/get-by-id-payload'
-import { testTableApi } from '@/requests/test-table/test-table-api'
+import { GetByIdPayload } from '@/domain/test-table/get-by-id-payload'
+import { testTableApi } from '@/requests/test-table-api'
 
 @Component
 export default class HelloWorld extends Vue {
