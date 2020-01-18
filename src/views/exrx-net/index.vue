@@ -23,7 +23,7 @@ import { exrxNetApi } from '@/requests/exrx-net-api'
 import cheerio from 'cheerio'
 import { DomUtil } from '@/utils/dom-util'
 import { bodyPartApi } from '@/requests/body-part/body-part-api'
-import { SaveBodyPartPayload } from '@/requests/body-part/payload/save-body-part-payload'
+import { SaveBodyPartPayload } from '@/domain/body-part/save-body-part-payload'
 
 export default Vue.extend({
   name: 'exrx-net',
