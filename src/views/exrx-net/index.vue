@@ -42,23 +42,37 @@ export default Vue.extend({
     muscleList: [] as string[]
   }),
   methods: {
-    readBodyPart (): void {
-      console.debug('this.mergedMuscleUnorderedList.children()', this.mergedMuscleUnorderedList.children())
-      this.bodyPartList = DomUtil.getFirstLevelTextArray(this.mergedMuscleUnorderedList.children())
+    async getAndParseBodyPart (): Promise<any> {
+      try {
+        const response = await exrxNetApi.exerciseDirectory()
+        this.$toast.success('Succeed to getFirstText extercise directory.')
+        const cheerioInstance = cheerio.load(response)
+        this.mergedMuscleUnorderedList = DomUtil.mergeSameLevelUnorderedList(cheerioInstance('.col-sm-6').find('div > ul'))
+        this.bodyPartList = DomUtil.getFirstLevelTextArray(this.mergedMuscleUnorderedList.children())
+      } catch (error) {
+        console.error('Error occurred when sending request `exerciseDirectory`!', error)
+        this.$toast.error('Error occurred when sending request `exerciseDirectory`!')
+        return Promise.reject(error)
+      }
     },
-    async getMuscleList (): Promise<any> {
-      const response = await exrxNetApi.muscleList()
-      const cheerioInstance = cheerio.load(response)
-      const cheerio1 = cheerioInstance('.col-sm-6').find('li')
-      this.muscleList = DomUtil.getFirstLevelTextArray(cheerio1)
-      // Iterate list to compensate lost muscle data
-      cheerio1.each((index, element) => {
-        const trimmedMuscleItem = element.firstChild.data?.trim()
-        if (trimmedMuscleItem) {
-          this.muscleList[index] = trimmedMuscleItem
-        }
-      })
-      console.info('muscleList', this.muscleList)
+    async getAndParseMuscleList (): Promise<any> {
+      try {
+        const response = await exrxNetApi.muscleList()
+        const cheerioInstance = cheerio.load(response)
+        const cheerio1 = cheerioInstance('.col-sm-6').find('li')
+        this.muscleList = DomUtil.getFirstLevelTextArray(cheerio1)
+        // Iterate list to compensate lost muscle data
+        cheerio1.each((index, element) => {
+          const trimmedMuscleItem = element.firstChild.data?.trim()
+          if (trimmedMuscleItem) {
+            this.muscleList[index] = trimmedMuscleItem
+          }
+        })
+      } catch (error) {
+        console.error('Error occurred when sending request `exerciseDirectory`!', error)
+        this.$toast.error('Error occurred when sending request `exerciseDirectory`!')
+        return Promise.reject(error)
+      }
     },
     async handleClickSaveBodyPart (): Promise<void> {
       if (!this.bodyPartList.length) {
@@ -85,21 +99,15 @@ export default Vue.extend({
       this.loadingMuscle = true
     }
   },
-  async mounted () {
+  mounted () {
     this.loadingContent = true
-    this.getMuscleList()
-    try {
-      const response = await exrxNetApi.exerciseDirectory()
-      this.$toast.success('Succeed to getFirstText extercise directory.')
-      const cheerioInstance = cheerio.load(response)
-      this.mergedMuscleUnorderedList = DomUtil.mergeSameLevelUnorderedList(cheerioInstance('.col-sm-6').find('div > ul'))
-      this.readBodyPart()
-    } catch (error) {
-      console.error('Error occurred when sending request `exerciseDirectory`!', error)
-      this.$toast.error('Error occurred when sending request `exerciseDirectory`!')
-    } finally {
+    const tasks = [
+      this.getAndParseBodyPart(),
+      this.getAndParseMuscleList()
+    ]
+    Promise.all(tasks).finally(() => {
       this.loadingContent = false
-    }
+    })
   }
 })
 </script>
