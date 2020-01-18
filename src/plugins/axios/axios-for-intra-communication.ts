@@ -62,8 +62,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (axiosResponse: AxiosResponse) => {
     // Only the HTTP status code is equal to 200, axios would resolve the promise
-    const data = axiosResponse.data
-    return Promise.resolve(data.data)
+    return Promise.resolve(axiosResponse.data)
   },
   (error: any) => {
     console.error('[IntraAxios] Error occurred when handling response!', error)
