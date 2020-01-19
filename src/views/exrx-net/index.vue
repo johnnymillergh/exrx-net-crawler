@@ -34,6 +34,7 @@ import { SaveMusclePayload } from '@/domain/muscle/save-muscle-payload'
 import { MusclePayload } from '@/domain/muscle/muscle-payload'
 import { muscleApi } from '@/requests/muscle-api'
 import { MuscleLink } from '@/domain/muscle/muscle-link'
+import { HyperlinkUtil } from '@/utils/hyperlink-util'
 
 export default Vue.extend({
   name: 'exrx-net',
@@ -78,6 +79,11 @@ export default Vue.extend({
             ml.link = muscleLink[0].attribs.href
           }
           this.muscleLinkList.push(ml)
+        })
+        this.muscleLinkList.forEach(item => {
+          if (item.link) {
+            item.link = HyperlinkUtil.restorePathToUrl(item.link)
+          }
         })
       } catch (error) {
         console.error('Error occurred when sending request `exerciseDirectory`!', error)
