@@ -214,10 +214,16 @@ export function legacyPost (url: string, params: any): Promise<any> {
  * @return {Promise<any>} Response data.
  */
 export function postWithMultipart (url: string, data: any): Promise<any> {
-  const map = new Map<string, any>(Object.entries(data))
+  const objectKeyValueMap = new Map<string, any>(Object.entries(data))
   const formData = new FormData()
-  map.forEach((value, key) => {
-    formData.append(key, value)
+  objectKeyValueMap.forEach((value, key) => {
+    if (value instanceof Array) {
+      for (const item of value) {
+        formData.append(key, item)
+      }
+    } else {
+      formData.append(key, value)
+    }
   })
   const config = {
     headers: { 'Content-Type': 'multipart/form-data' }
