@@ -204,6 +204,37 @@ export function legacyPost (url: string, params: any): Promise<any> {
 
 // noinspection JSUnusedGlobalSymbols
 /**
+ * Send a POST request with multipart.
+ *
+ * The HTTP POST method sends data to the server. The type of the body of the request is indicated by the Content-Type header.
+ *
+ * @see <a href='https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST'>HTTP request methods — POST | MDN</a>
+ * @param url URL.
+ * @param data data
+ * @return {Promise<any>} Response data.
+ */
+export function postWithMultipart (url: string, data: any): Promise<any> {
+  const map = new Map<string, any>(Object.entries(data))
+  const formData = new FormData()
+  map.forEach((value, key) => {
+    formData.append(key, value)
+  })
+  const config = {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }
+  return new Promise((resolve, reject) => {
+    service.post(url, formData, config)
+      .then(response => {
+        resolve(response)
+      })
+      .catch(rejectedReason => {
+        reject(rejectedReason)
+      })
+  })
+}
+
+// noinspection JSUnusedGlobalSymbols
+/**
  * Send a PUT request.
  *
  * The HTTP PUT request method creates a new resource or replaces a representation of the target resource with the request payload.
