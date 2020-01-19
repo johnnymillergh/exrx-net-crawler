@@ -43,8 +43,11 @@ import { HttpStatus } from '@/constants/http-status'
 // 1. Create an axios instance.
 export const service = Axios.create({
   baseURL: 'https://cors-anywhere.herokuapp.com',
+  // headers: {
+  //   Origin: 'X-Requested-With'
+  // },
   // Request timeout: 30s
-  timeout: 30000,
+  // timeout: 30000,
   /**
    * `validateStatus` defines whether to resolve or reject the promise for a given HTTP response status code.
    * The value of status must be less than 999.
