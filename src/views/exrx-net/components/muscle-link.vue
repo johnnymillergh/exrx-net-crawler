@@ -49,7 +49,9 @@ export default class MuscleLinkView extends Vue {
   @Watch('muscleLinkList')
   private handleMuscleLinkListChange (value: Array<MuscleLink>) {
     if (value.length) {
-      this.loadingContent = false
+      setTimeout(() => {
+        this.loadingContent = false
+      }, 1000)
     }
   }
 
