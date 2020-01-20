@@ -21,7 +21,7 @@
         <v-row>Muscle link list: {{ muscleLinkList }}</v-row>
         <v-row>
           <v-btn v-debounced-click="handleClickUpdateMuscleDetails" :loading="loadingUpdateMuscleDetails"
-                 color="primary" block>
+                 :disabled="loadingUpdateMuscleDetails" color="primary" block>
             <template v-slot:loader>
               <span>{{ updateMuscleDetailsProgress }}</span>
             </template>
