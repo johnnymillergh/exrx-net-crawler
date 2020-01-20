@@ -3,7 +3,7 @@
  * @date 1/2/20 9:15 AM
  */
 // eslint-disable-next-line no-unused-vars
-import Axios, { AxiosRequestConfig, AxiosResponse, Canceler } from 'axios'
+import Axios, { AxiosRequestConfig, AxiosResponse, Canceler, ResponseType } from 'axios'
 import * as Cancellation from '@/plugins/axios/cancellation'
 import { HttpStatus } from '@/constants/http-status'
 
@@ -101,15 +101,17 @@ service.interceptors.response.use(
  *
  * The GET method requests a representation of the specified resource. Requests using GET should only retrieve data.
  *
- * @param url URL
- * @param params Params
+ * @param url URL.
+ * @param params Params.
+ * @param responseType Response type.
  * @return {Promise<any>} Response data.
  * @see <a href='https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET'>HTTP request methods — GET | MDN</a>
  */
-export function get (url: string, params?: any): Promise<any> {
+export function get (url: string, params?: any, responseType?: ResponseType): Promise<any> {
   return new Promise<any>((resolve, reject) => {
     service.get(url, {
-      params: params
+      params: params,
+      responseType: responseType
     }).then(resp => {
       resolve(resp)
     }).catch(rejectedReason => {

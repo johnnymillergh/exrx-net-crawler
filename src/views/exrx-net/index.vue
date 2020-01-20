@@ -110,7 +110,7 @@ export default Vue.extend({
       }
       const updateMuscleDetailsPayload = new UpdateMuscleDetailsPayload()
       updateMuscleDetailsPayload.name = muscleLink.name
-      const response = await exrxNetApi.getHtmlByUrl(muscleLink?.link)
+      const response = await exrxNetApi.getResourceByUrl(muscleLink?.link)
       const cheerio1 = cheerio.load(response)
       try {
         updateMuscleDetailsPayload.otherNames = DomUtil.getFirstLevelTextArray(cheerio1('.col-sm-6').find('h2:contains(\'Other Names\')').next())
@@ -140,7 +140,7 @@ export default Vue.extend({
         imageUrlList.push(HyperlinkUtil.restorePathToUrl(element.attribs.src))
       })
       for (const url of imageUrlList) {
-        const image = await exrxNetApi.getHtmlByUrl(url)
+        const image = await exrxNetApi.getResourceByUrl(url, undefined, 'arraybuffer')
         const imageFile = new File([image], HyperlinkUtil.parseFileNameFromUrl(url))
         updateMuscleDetailsPayload.muscleImageList.push(imageFile)
       }
