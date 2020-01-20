@@ -1,83 +1,16 @@
 <template>
   <v-app id="exrx-app">
-    <v-card id="exrx-card" :loading="loadingContent" outlined>
+    <v-card id="exrx-card" outlined>
       <v-card-title>
         <v-icon large left>mdi-file-document</v-icon>
         <span class="title font-weight-light">ExRx.net Document</span>
       </v-card-title>
       <div id="result-container">
-        <v-card>
-          <v-card-title>Human Body Part List</v-card-title>
-          <v-card-subtitle>
-            <span>Length: {{ bodyPartList.length }}</span>
-          </v-card-subtitle>
-          <v-card-actions>
-            <v-btn v-debounced-click="handleClickSaveBodyPart" :loading="loadingSaveBodyPart" color="primary" text>
-              Save Body Part
-            </v-btn>
-            <v-spacer/>
-            <v-btn icon @click="showBodyPartList = !showBodyPartList">
-              <v-icon>{{ showBodyPartList ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-            </v-btn>
-          </v-card-actions>
-          <v-expand-transition>
-            <div v-show="showBodyPartList">
-              <v-divider/>
-              <v-card-text>
-                {{ bodyPartList }}
-              </v-card-text>
-            </div>
-          </v-expand-transition>
-        </v-card>
+        <body-part/>
         <v-divider class="content-divider"/>
-        <v-card>
-          <v-card-title>Muscle List</v-card-title>
-          <v-card-subtitle>
-            <span>Length: {{ muscleList.length }}</span>
-          </v-card-subtitle>
-          <v-card-actions>
-            <v-btn v-debounced-click="handleClickSaveMuscleList" :loading="loadingMuscle" color="primary" text>
-              Save Muscle
-            </v-btn>
-            <v-spacer/>
-            <v-btn icon @click="showMuscleList = !showMuscleList">
-              <v-icon>{{ showMuscleList ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-            </v-btn>
-          </v-card-actions>
-          <v-expand-transition>
-            <div v-show="showMuscleList">
-              <v-divider/>
-              <v-card-text>
-                {{ muscleList }}
-              </v-card-text>
-            </div>
-          </v-expand-transition>
-        </v-card>
+        <muscle v-on:muscle-link-generated="handelMuscleLinkGenerated"/>
         <v-divider class="content-divider"/>
-        <v-card>
-          <v-card-title>Muscle Link List</v-card-title>
-          <v-card-subtitle>
-            <span>Length: {{ muscleLinkList.length }} {{ updateMuscleDetailsProgress }}</span>
-          </v-card-subtitle>
-          <v-card-actions>
-            <v-btn v-debounced-click="handleClickUpdateMuscleDetails" :loading="loadingUpdateMuscleDetails"
-                   :disabled="loadingUpdateMuscleDetails" color="primary" text>
-              Update Muscle Details
-            </v-btn>
-            <v-spacer/>
-            <v-btn icon @click="showMuscleLinkList = !showMuscleLinkList">
-              <v-icon>{{ showMuscleLinkList ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-            </v-btn>
-          </v-card-actions>
-          <v-expand-transition>
-            <div v-show="showMuscleLinkList">
-              <v-divider/>
-              <v-card-text>
-                {{ muscleLinkList }}
-              </v-card-text>
-            </div>
-          </v-expand-transition>
-        </v-card>
+        <muscle-link-view :muscle-link-list="muscleLinkList"/>
       </div>
     </v-card>
   </v-app>
@@ -85,205 +18,26 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { exrxNetApi } from '@/requests/exrx-net-api'
-import cheerio from 'cheerio'
-import { DomUtil } from '@/utils/dom-util'
-import { bodyPartApi } from '@/requests/body-part-api'
-import { SaveBodyPartPayload } from '@/domain/body-part/save-body-part-payload'
-import { SaveMusclePayload } from '@/domain/muscle/save-muscle-payload'
-import { MusclePayload } from '@/domain/muscle/muscle-payload'
-import { muscleApi } from '@/requests/muscle-api'
+import BodyPart from './components/body-part.vue'
+import Muscle from './components/muscle.vue'
+import MuscleLinkView from './components/muscle-link.vue'
+// eslint-disable-next-line no-unused-vars
 import { MuscleLink } from '@/domain/muscle/muscle-link'
-import { HyperlinkUtil } from '@/utils/hyperlink-util'
-import { UpdateMuscleDetailsPayload } from '@/domain/muscle/update-muscle-details-payload'
 
 export default Vue.extend({
   name: 'exrx-net',
+  components: {
+    BodyPart,
+    Muscle,
+    MuscleLinkView
+  },
   data: () => ({
-    loadingContent: false,
-    mergedMuscleUnorderedList: {} as Cheerio,
-    bodyPartList: [] as string[],
-    loadingSaveBodyPart: false,
-    loadingMuscle: false,
-    loadingUpdateMuscleDetails: false,
-    muscleList: [] as string[],
-    muscleLinkList: [] as Array<MuscleLink>,
-    updateMuscleDetailsProgress: '',
-    showBodyPartList: false,
-    showMuscleList: false,
-    showMuscleLinkList: false
+    muscleLinkList: [] as Array<MuscleLink>
   }),
   methods: {
-    async getAndParseBodyPart (): Promise<any> {
-      try {
-        const response = await exrxNetApi.exerciseDirectory()
-        const cheerioInstance = cheerio.load(response)
-        this.mergedMuscleUnorderedList = DomUtil.mergeSameLevelUnorderedList(cheerioInstance('.col-sm-6').find('div > ul'))
-        this.bodyPartList = DomUtil.getFirstLevelTextArray(this.mergedMuscleUnorderedList.children())
-      } catch (error) {
-        console.error('Error occurred when sending request `exerciseDirectory`!', error)
-        this.$toast.error(`Error occurred when sending request \`exerciseDirectory\`! Cause: ${error.message}`)
-        return Promise.reject(error)
-      }
-    },
-    async getAndParseMuscleList (): Promise<any> {
-      try {
-        const response = await exrxNetApi.muscleList()
-        const cheerioInstance = cheerio.load(response)
-        const cheerio1 = cheerioInstance('.col-sm-6').find('li')
-        this.muscleList = DomUtil.getFirstLevelTextArray(cheerio1)
-        // Iterate list to compensate lost muscle data
-        cheerio1.each((index, element) => {
-          const trimmedMuscleItem = element.firstChild.data?.trim()
-          if (trimmedMuscleItem) {
-            this.muscleList[index] = trimmedMuscleItem
-          }
-          const muscleLink = cheerio.load(element)('a')
-          const ml = new MuscleLink()
-          ml.name = this.muscleList[index]
-          if (muscleLink.length === 1) {
-            ml.link = muscleLink[0].attribs.href
-          }
-          this.muscleLinkList.push(ml)
-        })
-        this.muscleLinkList.forEach(item => {
-          if (item.link) {
-            item.link = HyperlinkUtil.restorePathToUrl(item.link)
-          }
-        })
-      } catch (error) {
-        console.error('Error occurred when sending request `exerciseDirectory`!', error)
-        this.$toast.error(`Error occurred when sending request \`exerciseDirectory\`! Cause: ${error.message}`)
-        return Promise.reject(error)
-      }
-    },
-    async getAndParseMuscleDetails (muscleLink: MuscleLink): Promise<any> {
-      if (!muscleLink.link) {
-        return
-      }
-      const updateMuscleDetailsPayload = new UpdateMuscleDetailsPayload()
-      updateMuscleDetailsPayload.name = muscleLink.name
-      const response = await exrxNetApi.getResourceByUrl(muscleLink?.link)
-      const cheerio1 = cheerio.load(response)
-      try {
-        updateMuscleDetailsPayload.otherNames = DomUtil.getFirstLevelTextArray(cheerio1('.col-sm-6').find('h2:contains(\'Other Names\')').next())
-      } catch (error) {
-        console.info('Muscle doesn\'t have otherNames', muscleLink, error)
-      }
-      try {
-        updateMuscleDetailsPayload.relatedMuscleNameList = DomUtil.getFirstLevelTextArray(cheerio1('.col-sm-6').find('h2:contains(\'Related Muscles\')').next())
-      } catch (error) {
-        console.info('Muscle doesn\'t have relatedMuscleNameList', muscleLink, error)
-      }
-      const muscleImages = cheerio1('.col-sm-6').find('img')
-      await this.getMuscleImage(muscleImages, updateMuscleDetailsPayload)
-      console.info('updateMuscleDetailsPayload', updateMuscleDetailsPayload)
-      try {
-        const response = await muscleApi.updateMuscleDetails(updateMuscleDetailsPayload)
-        this.$toast.success(response.message)
-      } catch (error) {
-        console.error('Error occurred when sending request `updateMuscleDetails`!', error)
-        this.$toast.error(`Error occurred when sending request 'updateMuscleDetails'! Cause: ${error.message}`)
-      }
-    },
-    async getMuscleImage (muscleImages: Cheerio, updateMuscleDetailsPayload: UpdateMuscleDetailsPayload): Promise<void> {
-      const imageUrlList = [] as string[]
-      muscleImages.each((index, element) => {
-        // TODO: parse img alt (alternative text of image)
-        imageUrlList.push(HyperlinkUtil.restorePathToUrl(element.attribs.src))
-      })
-      for (const url of imageUrlList) {
-        const image = await exrxNetApi.getResourceByUrl(url, undefined, 'arraybuffer')
-        const imageFile = new File([image], HyperlinkUtil.parseFileNameFromUrl(url))
-        updateMuscleDetailsPayload.muscleImageList.push(imageFile)
-      }
-      return Promise.resolve()
-    },
-    async handleClickSaveBodyPart (): Promise<void> {
-      if (!this.bodyPartList.length) {
-        this.$toast.warning('Invalid data!')
-        return
-      }
-      this.loadingSaveBodyPart = true
-      const saveBodyPartPayload = new SaveBodyPartPayload()
-      saveBodyPartPayload.bodyPartNameList = this.bodyPartList
-      try {
-        const response = await bodyPartApi.saveBodyPart(saveBodyPartPayload)
-        this.$toast.success(response.message)
-      } catch (error) {
-        console.error('Error occurred when saving body part!', error)
-        this.$toast.error(`Error occurred when saving body part! Cause: ${error.message}`)
-      } finally {
-        this.loadingSaveBodyPart = false
-      }
-    },
-    async handleClickSaveMuscleList (): Promise<void> {
-      if (!this.muscleList.length) {
-        this.$toast.warning('Invalid data!')
-        return
-      }
-      this.loadingMuscle = true
-      const saveMusclePayload = new SaveMusclePayload()
-      saveMusclePayload.musclePayloadList = []
-      this.muscleList.forEach(muscle => {
-        const musclePayload = new MusclePayload()
-        musclePayload.name = muscle
-        saveMusclePayload.musclePayloadList.push(musclePayload)
-      })
-      try {
-        const response = await muscleApi.saveMuscle(saveMusclePayload)
-        this.$toast.success(response.message)
-      } catch (error) {
-        console.error('Error occurred when saving muscle!', error)
-        this.$toast.error(`Error occurred when saving muscle! Cause: ${error.message}`)
-      } finally {
-        this.loadingMuscle = false
-      }
-    },
-    timeoutHandler (muscleLink: MuscleLink) {
-      return new Promise((resolve, reject) => {
-        const timeout = Math.round(Math.random() * 5) * 1000
-        const that = this
-        setTimeout(async function () {
-          try {
-            await that.getAndParseMuscleDetails(muscleLink)
-            return resolve(muscleLink)
-          } catch (error) {
-            return reject(error)
-          }
-        }, timeout)
-      })
-    },
-    async handleClickUpdateMuscleDetails (): Promise<void> {
-      if (!this.muscleLinkList.length) {
-        this.$toast.warning('Invalid data!')
-        return
-      }
-      this.loadingUpdateMuscleDetails = true
-      try {
-        for (const item of this.muscleLinkList) {
-          const index = this.muscleLinkList.indexOf(item)
-          this.updateMuscleDetailsProgress = `Updating muscle. Progress: ${index + 1} of ${this.muscleLinkList.length}`
-          console.info(`muscleLink ${index}`, item)
-          await this.timeoutHandler(item)
-        }
-      } catch (error) {
-        console.error('Error occurred when updating muscle details!', error)
-        this.$toast.error('Error occurred when updating muscle details!')
-      } finally {
-        this.loadingUpdateMuscleDetails = false
-      }
+    handelMuscleLinkGenerated (generatedMuscleLinkList: Array<MuscleLink>) {
+      this.muscleLinkList = generatedMuscleLinkList
     }
-  },
-  mounted () {
-    this.loadingContent = true
-    const tasks = [
-      this.getAndParseBodyPart(),
-      this.getAndParseMuscleList()
-    ]
-    Promise.all(tasks).finally(() => {
-      this.loadingContent = false
-    })
   }
 })
 </script>
