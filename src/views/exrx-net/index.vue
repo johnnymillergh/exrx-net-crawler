@@ -6,28 +6,81 @@
         <span class="title font-weight-light">ExRx.net Document</span>
       </v-card-title>
       <div id="result-container">
-        <v-row>Human Body Parts: {{ bodyPartList }}</v-row>
-        <v-row>
-          <v-btn v-debounced-click="handleClickSaveBodyPart" :loading="loadingSaveBodyPart" color="primary" block>
-            Save Body Part
-          </v-btn>
-        </v-row>
-        <v-row>Muscle: {{ muscleList }}</v-row>
-        <v-row>
-          <v-btn v-debounced-click="handleClickSaveMuscleList" :loading="loadingMuscle" color="primary" block>
-            Save Muscle
-          </v-btn>
-        </v-row>
-        <v-row>Muscle link list: {{ muscleLinkList }}</v-row>
-        <v-row>
-          <v-btn v-debounced-click="handleClickUpdateMuscleDetails" :loading="loadingUpdateMuscleDetails"
-                 :disabled="loadingUpdateMuscleDetails" color="primary" block>
-            <template v-slot:loader>
-              <span>{{ updateMuscleDetailsProgress }}</span>
-            </template>
-            Update Muscle Details
-          </v-btn>
-        </v-row>
+        <v-card>
+          <v-card-title>Human Body Part List</v-card-title>
+          <v-card-subtitle>
+            <span>Length: {{ bodyPartList.length }}</span>
+          </v-card-subtitle>
+          <v-card-actions>
+            <v-btn v-debounced-click="handleClickSaveBodyPart" :loading="loadingSaveBodyPart" color="primary" text>
+              Save Body Part
+            </v-btn>
+            <v-spacer/>
+            <v-btn icon @click="showBodyPartList = !showBodyPartList">
+              <v-icon>{{ showBodyPartList ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+            </v-btn>
+          </v-card-actions>
+          <v-expand-transition>
+            <div v-show="showBodyPartList">
+              <v-divider/>
+              <v-card-text>
+                {{ bodyPartList }}
+              </v-card-text>
+            </div>
+          </v-expand-transition>
+        </v-card>
+        <v-divider class="content-divider"/>
+        <v-card>
+          <v-card-title>Muscle List</v-card-title>
+          <v-card-subtitle>
+            <span>Length: {{ muscleList.length }}</span>
+          </v-card-subtitle>
+          <v-card-actions>
+            <v-btn v-debounced-click="handleClickSaveMuscleList" :loading="loadingMuscle" color="primary" text>
+              Save Muscle
+            </v-btn>
+            <v-spacer/>
+            <v-btn icon @click="showMuscleList = !showMuscleList">
+              <v-icon>{{ showMuscleList ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+            </v-btn>
+          </v-card-actions>
+          <v-expand-transition>
+            <div v-show="showMuscleList">
+              <v-divider/>
+              <v-card-text>
+                {{ muscleList }}
+              </v-card-text>
+            </div>
+          </v-expand-transition>
+        </v-card>
+        <v-divider class="content-divider"/>
+        <v-card>
+          <v-card-title>Muscle Link List</v-card-title>
+          <v-card-subtitle>
+            <span>Length: {{ muscleLinkList.length }}</span>
+          </v-card-subtitle>
+          <v-card-actions>
+            <v-btn v-debounced-click="handleClickUpdateMuscleDetails" :loading="loadingUpdateMuscleDetails"
+                   :disabled="loadingUpdateMuscleDetails" color="primary" text>
+              <template v-slot:loader>
+                <span>{{ updateMuscleDetailsProgress }}</span>
+              </template>
+              Update Muscle Details
+            </v-btn>
+            <v-spacer/>
+            <v-btn icon @click="showMuscleLinkList = !showMuscleLinkList">
+              <v-icon>{{ showMuscleLinkList ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+            </v-btn>
+          </v-card-actions>
+          <v-expand-transition>
+            <div v-show="showMuscleLinkList">
+              <v-divider/>
+              <v-card-text>
+                {{ muscleLinkList }}
+              </v-card-text>
+            </div>
+          </v-expand-transition>
+        </v-card>
       </div>
     </v-card>
   </v-app>
@@ -58,7 +111,10 @@ export default Vue.extend({
     loadingUpdateMuscleDetails: false,
     muscleList: [] as string[],
     muscleLinkList: [] as Array<MuscleLink>,
-    updateMuscleDetailsProgress: ''
+    updateMuscleDetailsProgress: '',
+    showBodyPartList: false,
+    showMuscleList: false,
+    showMuscleLinkList: false
   }),
   methods: {
     async getAndParseBodyPart (): Promise<any> {
@@ -242,5 +298,10 @@ export default Vue.extend({
 
 #result-container {
   padding: 20px;
+}
+
+.content-divider {
+  margin-top: 12px;
+  margin-bottom: 12px
 }
 </style>

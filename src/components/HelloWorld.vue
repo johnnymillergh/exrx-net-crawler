@@ -15,6 +15,7 @@
         <p>Environment: {{ environment }}</p>
       </v-flex>
     </v-layout>
+    <v-divider style="margin-bottom: 24px"/>
     <v-row>
       <v-btn v-debounced-click="handelClickTest" block color="primary">Test Back-end Service</v-btn>
     </v-row>
