@@ -57,14 +57,11 @@
         <v-card>
           <v-card-title>Muscle Link List</v-card-title>
           <v-card-subtitle>
-            <span>Length: {{ muscleLinkList.length }}</span>
+            <span>Length: {{ muscleLinkList.length }} {{ updateMuscleDetailsProgress }}</span>
           </v-card-subtitle>
           <v-card-actions>
             <v-btn v-debounced-click="handleClickUpdateMuscleDetails" :loading="loadingUpdateMuscleDetails"
                    :disabled="loadingUpdateMuscleDetails" color="primary" text>
-              <template v-slot:loader>
-                <span>{{ updateMuscleDetailsProgress }}</span>
-              </template>
               Update Muscle Details
             </v-btn>
             <v-spacer/>
