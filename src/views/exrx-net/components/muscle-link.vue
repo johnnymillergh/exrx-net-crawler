@@ -37,7 +37,7 @@ import { UpdateMuscleDetailsPayload } from '@/domain/muscle/update-muscle-detail
 import { muscleApi } from '@/requests/muscle-api'
 
 @Component
-export default class HelloWorld extends Vue {
+export default class MuscleLinkView extends Vue {
   @Prop() private muscleLinkList!: Array<MuscleLink>
 
   private loadingContent = false
