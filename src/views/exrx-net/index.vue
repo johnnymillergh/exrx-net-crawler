@@ -105,7 +105,6 @@ export default Vue.extend({
       }
     },
     async getAndParseMuscleDetails (muscleLink: MuscleLink): Promise<any> {
-      console.info('muscleLink', muscleLink)
       if (!muscleLink.link) {
         return
       }
@@ -212,6 +211,7 @@ export default Vue.extend({
         for (const item of this.muscleLinkList) {
           const index = this.muscleLinkList.indexOf(item)
           this.updateMuscleDetailsProgress = `Updating muscle. Progress: ${index + 1} of ${this.muscleLinkList.length}`
+          console.info(`muscleLink ${index}`, item)
           await this.timeoutHandler(item)
         }
       } catch (error) {
