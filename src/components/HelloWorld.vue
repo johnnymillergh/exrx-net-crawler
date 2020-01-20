@@ -39,7 +39,7 @@ export default class HelloWorld extends Vue {
 
   async mounted () {
     this.version = AppUtil.getVersionInfo()
-    this.environment = `Environment: ${process.env.NODE_ENV} (${process.env.VUE_APP_ENV})`
+    this.environment = `${process.env.NODE_ENV} (${process.env.VUE_APP_ENV})`
   }
 
   async handelClickTest (): Promise<void> {
