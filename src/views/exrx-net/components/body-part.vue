@@ -64,13 +64,13 @@ export default Vue.extend({
             const exerciseLinkSortedByBodyPart = new ExerciseLinkSortedByBodyPart()
             exerciseLinkSortedByBodyPart.bodyPartName = element.children[0].data
             if (element.attribs.href.search(exerciseListPrefix) < 0) {
-              exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/${exerciseListPrefix}${element.attribs.href}`)
+              exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/Lists/${exerciseListPrefix}${element.attribs.href}`)
             } else {
               // { "bodyPartName": "Shoulders", "link": "https://exrx.net/Lists/ExList/ShouldWt" }
               if (validator.isURL(element.attribs.href)) {
                 exerciseLinkSortedByBodyPart.link = element.attribs.href
               } else {
-                exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/${element.attribs.href}`)
+                exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/Lists/${element.attribs.href}`)
               }
             }
             this.exerciseLinkList.push(exerciseLinkSortedByBodyPart)
