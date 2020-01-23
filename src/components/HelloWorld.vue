@@ -7,7 +7,7 @@
     <v-layout text-center wrap>
       <v-flex xs12>
         <!--suppress HtmlUnknownTarget -->
-        <v-img :src="require('@/assets/logo.svg')" class="my-3" contain height="200"/>
+        <v-img :src="require('@/assets/exrx-net-crawler-social-image.png')" class="my-3" contain height="400"/>
       </v-flex>
       <v-flex mb-4>
         <h1 class="display-2 font-weight-bold mb-3">Welcome to Exrx Net Crawler</h1>
