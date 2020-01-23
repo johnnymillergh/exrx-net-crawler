@@ -58,20 +58,14 @@ export default Vue.extend({
         this.mergedMuscleUnorderedList = DomUtil.mergeSameLevelUnorderedList(cheerioInstance('.col-sm-6').find('div > ul'))
         this.bodyPartList = DomUtil.getFirstLevelTextArray(this.mergedMuscleUnorderedList.children())
         const invalidLinkRegExp = /#+/
-        const exerciseListPrefix = 'ExList/'
         this.mergedMuscleUnorderedList.find('a').each((index, element) => {
           if (!invalidLinkRegExp.test(element.attribs.href)) {
             const exerciseLinkSortedByBodyPart = new ExerciseLinkSortedByBodyPart()
             exerciseLinkSortedByBodyPart.bodyPartName = element.children[0].data
-            if (element.attribs.href.search(exerciseListPrefix) < 0) {
-              exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/Lists/${exerciseListPrefix}${element.attribs.href}`)
+            if (validator.isURL(element.attribs.href)) {
+              exerciseLinkSortedByBodyPart.link = element.attribs.href
             } else {
-              // { "bodyPartName": "Shoulders", "link": "https://exrx.net/Lists/ExList/ShouldWt" }
-              if (validator.isURL(element.attribs.href)) {
-                exerciseLinkSortedByBodyPart.link = element.attribs.href
-              } else {
-                exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/Lists/${element.attribs.href}`)
-              }
+              exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/Lists/${element.attribs.href}`)
             }
             this.exerciseLinkList.push(exerciseLinkSortedByBodyPart)
           }
