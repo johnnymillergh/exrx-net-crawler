@@ -1,3 +1,4 @@
+import validator from "validator"
 <template>
   <v-card :loading="loadingContent">
     <v-card-title>Human Body Part List</v-card-title>
@@ -20,7 +21,7 @@
           <h3>Body Part List</h3>
           <p>{{ bodyPartList }}</p>
           <h3>Exercise Link List (sorted by body part)</h3>
-          <span >Length: {{ exerciseLinkList.length }}</span>
+          <span>Length: {{ exerciseLinkList.length }}</span>
           <p>{{ exerciseLinkList }}</p>
         </v-card-text>
       </div>
@@ -37,6 +38,7 @@ import { SaveBodyPartPayload } from '@/domain/body-part/save-body-part-payload'
 import { bodyPartApi } from '@/requests/body-part-api'
 import { ExerciseLinkSortedByBodyPart } from '@/domain/body-part/exercise-link-sorted-by-body-part'
 import { HyperlinkUtil } from '@/utils/hyperlink-util'
+import validator from 'validator'
 
 export default Vue.extend({
   name: 'body-part',
@@ -64,7 +66,12 @@ export default Vue.extend({
             if (element.attribs.href.search(exerciseListPrefix) < 0) {
               exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/${exerciseListPrefix}${element.attribs.href}`)
             } else {
-              exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/${element.attribs.href}`)
+              // { "bodyPartName": "Shoulders", "link": "https://exrx.net/Lists/ExList/ShouldWt" }
+              if (validator.isURL(element.attribs.href)) {
+                exerciseLinkSortedByBodyPart.link = element.attribs.href
+              } else {
+                exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/${element.attribs.href}`)
+              }
             }
             this.exerciseLinkList.push(exerciseLinkSortedByBodyPart)
           }
