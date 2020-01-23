@@ -76,6 +76,7 @@ export default Vue.extend({
             this.exerciseLinkList.push(exerciseLinkSortedByBodyPart)
           }
         })
+        this.$emit('exercise-link-list-generated', this.exerciseLinkList)
       } catch (error) {
         console.error('Error occurred when sending request `exerciseDirectory`!', error)
         this.$toast.error(`Error occurred when sending request \`exerciseDirectory\`! Cause: ${error.message}`)
