@@ -17,7 +17,11 @@
       <div v-show="showBodyPartList">
         <v-divider/>
         <v-card-text>
-          {{ bodyPartList }}
+          <h3>Body Part List</h3>
+          <p>{{ bodyPartList }}</p>
+          <h3>Exercise Link List (sorted by body part)</h3>
+          <span >Length: {{ exerciseLinkList.length }}</span>
+          <p>{{ exerciseLinkList }}</p>
         </v-card-text>
       </div>
     </v-expand-transition>
@@ -31,6 +35,8 @@ import { exrxNetApi } from '@/requests/exrx-net-api'
 import { DomUtil } from '@/utils/dom-util'
 import { SaveBodyPartPayload } from '@/domain/body-part/save-body-part-payload'
 import { bodyPartApi } from '@/requests/body-part-api'
+import { ExerciseLinkSortedByBodyPart } from '@/domain/body-part/exercise-link-sorted-by-body-part'
+import { HyperlinkUtil } from '@/utils/hyperlink-util'
 
 export default Vue.extend({
   name: 'body-part',
@@ -39,7 +45,8 @@ export default Vue.extend({
     mergedMuscleUnorderedList: {} as Cheerio,
     bodyPartList: [] as string[],
     loadingSaveBodyPart: false,
-    showBodyPartList: false
+    showBodyPartList: false,
+    exerciseLinkList: [] as ExerciseLinkSortedByBodyPart[]
   }),
   methods: {
     async getAndParseBodyPart (): Promise<any> {
@@ -48,6 +55,20 @@ export default Vue.extend({
         const cheerioInstance = cheerio.load(response)
         this.mergedMuscleUnorderedList = DomUtil.mergeSameLevelUnorderedList(cheerioInstance('.col-sm-6').find('div > ul'))
         this.bodyPartList = DomUtil.getFirstLevelTextArray(this.mergedMuscleUnorderedList.children())
+        const invalidLinkRegExp = /#+/
+        const exerciseListPrefix = 'ExList/'
+        this.mergedMuscleUnorderedList.find('a').each((index, element) => {
+          if (!invalidLinkRegExp.test(element.attribs.href)) {
+            const exerciseLinkSortedByBodyPart = new ExerciseLinkSortedByBodyPart()
+            exerciseLinkSortedByBodyPart.bodyPartName = element.children[0].data
+            if (element.attribs.href.search(exerciseListPrefix) < 0) {
+              exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/${exerciseListPrefix}${element.attribs.href}`)
+            } else {
+              exerciseLinkSortedByBodyPart.link = HyperlinkUtil.restorePathToUrl(`/${element.attribs.href}`)
+            }
+            this.exerciseLinkList.push(exerciseLinkSortedByBodyPart)
+          }
+        })
       } catch (error) {
         console.error('Error occurred when sending request `exerciseDirectory`!', error)
         this.$toast.error(`Error occurred when sending request \`exerciseDirectory\`! Cause: ${error.message}`)
