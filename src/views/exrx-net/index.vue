@@ -11,6 +11,8 @@
         <muscle v-on:muscle-link-generated="handelMuscleLinkGenerated"/>
         <v-divider class="content-divider"/>
         <muscle-link-view :muscle-link-list="muscleLinkList"/>
+        <v-divider class="content-divider"/>
+        <exercise v-bind:exercise-link-sorted-by-body-part-list="exerciseLinkList"/>
       </div>
     </v-card>
   </v-app>
@@ -25,13 +27,15 @@ import MuscleLinkView from './components/muscle-link.vue'
 import { MuscleLink } from '@/domain/muscle/muscle-link'
 // eslint-disable-next-line no-unused-vars
 import { ExerciseLinkSortedByBodyPart } from '@/domain/body-part/exercise-link-sorted-by-body-part'
+import Exercise from '@/views/exrx-net/components/exercise.vue'
 
 export default Vue.extend({
   name: 'exrx-net',
   components: {
     BodyPart,
     Muscle,
-    MuscleLinkView
+    MuscleLinkView,
+    Exercise
   },
   data: () => ({
     muscleLinkList: [] as Array<MuscleLink>,
