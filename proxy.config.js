@@ -19,5 +19,12 @@ module.exports = {
     pathRewrite: {
       '^/muscle': `/${process.env.VUE_APP_BASE_API}/muscle`
     }
+  },
+  '/exercise': {
+    target: `${process.env.VUE_APP_BASE_URL}`,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/exercise': `/${process.env.VUE_APP_BASE_API}/exercise`
+    }
   }
 }

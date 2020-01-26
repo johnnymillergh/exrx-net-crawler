@@ -2,8 +2,10 @@
   <v-card :loading="loadingContent">
     <v-card-title>Exercise</v-card-title>
     <v-card-subtitle>
-      <span>Length: {{ exerciseLinkSortedByBodyPartList.length }}{{ saveExerciseProgressOfBodyPart }}</span>
+      <span>Length: {{ exerciseLinkSortedByBodyPartList.length }}</span>
+      <span>{{ saveExerciseProgressOfBodyPart }}</span>
       <span>{{ saveSpecificExerciseProgress }}</span>
+      <span>{{ saveExerciseProgress }}</span>
     </v-card-subtitle>
     <v-card-actions>
       <v-btn v-debounced-click="handleClickSaveExercise" :loading="loadingSaveExercise" :disabled="loadingSaveExercise"
@@ -37,6 +39,9 @@ import { DomUtil } from '@/utils/dom-util'
 import { ExerciseLinkSortedByBodyPart } from '@/domain/body-part/exercise-link-sorted-by-body-part'
 import { ExerciseLinkSortedByMuscle } from '@/domain/exercise/exercise-link-sorted-by-muscle'
 import { SpecificMuscleExerciseLink } from '@/domain/exercise/specific-muscle-exercise-link'
+import { HyperlinkUtil } from '@/utils/hyperlink-util'
+import { exerciseApi } from '@/requests/exercise-api'
+import { SaveExercisePayload } from '@/domain/exercise/save-exercise-payload'
 
 @Component
 export default class Exercise extends Vue {
@@ -48,6 +53,7 @@ export default class Exercise extends Vue {
   private showExercise = false
   private saveExerciseProgressOfBodyPart = ''
   private saveSpecificExerciseProgress = ''
+  private saveExerciseProgress = ''
   private currentBodyPart = ''
   private html: string | null = ''
 
@@ -83,10 +89,15 @@ export default class Exercise extends Vue {
       exerciseAmountList.forEach(item => {
         exerciseAmount += item
       })
-      this.saveSpecificExerciseProgress = `; exercise amount: ${exerciseAmount}`
-      exercise.forEach(item => {
+      this.saveSpecificExerciseProgress = `, exercise amount: ${exerciseAmount}`
+      for (const item of exercise) {
         // parse and save every specific exercise by exercise link
-      })
+        for (const link of item.exerciseLinkList) {
+          const index = item.exerciseLinkList.indexOf(link)
+          this.saveExerciseProgress = `; ${index + 1}. ${link.exerciseName}`
+          await this.parseSpecificExercise(link)
+        }
+      }
     }
   }
 
@@ -104,8 +115,8 @@ export default class Exercise extends Vue {
       const exerciseListItem = exerciseContainerDom.find('li > a')
       exerciseListItem.each((index, element) => {
         const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
+        exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element.attribs.href)
         exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element)('a').text().trim()
-        exerciseLinkSortedByMuscle.link = element.attribs.href
         specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
       })
       result.push(specificMuscleExerciseLink)
@@ -143,7 +154,7 @@ export default class Exercise extends Vue {
           console.info('exerciseLinkDom', exerciseLinkDom)
           exerciseLinkDom.each((index2, element2) => {
             const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
-            exerciseLinkSortedByMuscle.link = element2.attribs.href
+            exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element2.attribs.href)
             exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element2)('a').text().trim()
             exerciseLinkSortedByMuscle.equipmentName = equipmentName
             specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
@@ -157,8 +168,27 @@ export default class Exercise extends Vue {
     return Promise.resolve(result)
   }
 
-  async parseSpecificExercise () {
-
+  async parseSpecificExercise (exerciseLinkSortedByMuscle: ExerciseLinkSortedByMuscle) {
+    const response = await exrxNetApi.getResourceByUrl(exerciseLinkSortedByMuscle.link)
+    const article = cheerio.load(response)('article')
+    const exerciseGifDom = article.find('img').first()
+    const exerciseGifUrl = HyperlinkUtil.restorePathToUrl(exerciseGifDom.attr().src)
+    const exerciseGif = await exrxNetApi.getResourceByUrl(exerciseGifUrl, undefined, 'arraybuffer')
+    const classification = article.find('h2:contains(\'Classification\')').next()
+    console.info('classification', classification)
+    const saveExercisePayload = new SaveExercisePayload()
+    saveExercisePayload.exerciseName = cheerio.load(response)('h1.page-title').text().trim()
+    saveExercisePayload.exerciseGif = new File([exerciseGif], HyperlinkUtil.parseFileNameFromUrl(exerciseGifUrl))
+    saveExercisePayload.preparation = article.find('p:contains(\'Preparation\')').next().text().trim()
+    saveExercisePayload.execution = article.find('p:contains(\'Execution\')').next().text().trim()
+    saveExercisePayload.comments = article.find('h2:contains(\'Comments\')').next().text().trim()
+    try {
+      const saveExerciseResponse = await exerciseApi.saveExercise(saveExercisePayload)
+      this.$toast.success(saveExerciseResponse.message)
+    } catch (error) {
+      console.error('Error occurred when saving exercise!', error)
+      this.$toast.error(error.message)
+    }
   }
 
   mounted () {

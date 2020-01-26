@@ -13,6 +13,9 @@ export class HyperlinkUtil {
     if (validator.isURL(path)) {
       return path
     }
+    if (path.search('../..') === 0) {
+      return path.replace('../..', HyperlinkUtil.baseUrl)
+    }
     const valid = HyperlinkUtil.pathPattern.test(path)
     if (!valid) {
       throw new Error(`Invalid path. Path value: ${path}`)
