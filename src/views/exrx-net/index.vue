@@ -12,6 +12,8 @@
         <v-divider class="content-divider"/>
         <muscle-link-view :muscle-link-list="muscleLinkList"/>
         <v-divider class="content-divider"/>
+        <exercise-classification/>
+        <v-divider class="content-divider"/>
         <exercise v-bind:exercise-link-sorted-by-body-part-list="exerciseLinkList"/>
       </div>
     </v-card>
@@ -28,6 +30,7 @@ import { MuscleLink } from '@/domain/muscle/muscle-link'
 // eslint-disable-next-line no-unused-vars
 import { ExerciseLinkSortedByBodyPart } from '@/domain/body-part/exercise-link-sorted-by-body-part'
 import Exercise from '@/views/exrx-net/components/exercise.vue'
+import ExerciseClassification from '@/views/exrx-net/components/exercise-classification.vue'
 
 export default Vue.extend({
   name: 'exrx-net',
@@ -35,7 +38,8 @@ export default Vue.extend({
     BodyPart,
     Muscle,
     MuscleLinkView,
-    Exercise
+    Exercise,
+    ExerciseClassification
   },
   data: () => ({
     muscleLinkList: [] as Array<MuscleLink>,
