@@ -23,7 +23,6 @@
         <v-card-text>
           <h3>Exercise Link Sorted By Body Part List</h3>
           <p>{{ exerciseLinkSortedByBodyPartList }}</p>
-          <p v-html="html"/>
         </v-card-text>
       </div>
     </v-expand-transition>
@@ -58,7 +57,6 @@ export default class Exercise extends Vue {
   private saveSpecificExerciseProgress = ''
   private saveExerciseProgress = ''
   private currentBodyPart = ''
-  private html: string | null = ''
 
   @Watch('exerciseLinkSortedByBodyPartList')
   private handleMuscleLinkListChange (value: ExerciseLinkSortedByBodyPart[]) {
@@ -74,6 +72,8 @@ export default class Exercise extends Vue {
       this.$toast.warning('Invalid data!')
       return
     }
+    this.loadingContent = true
+    this.loadingSaveExercise = true
     // const temp = []
     // temp.push(this.exerciseLinkSortedByBodyPartList[9])
     for (const exerciseLink of this.exerciseLinkSortedByBodyPartList) {
@@ -102,6 +102,8 @@ export default class Exercise extends Vue {
         }
       }
     }
+    this.loadingContent = false
+    this.loadingSaveExercise = false
   }
 
   async getAndParseExerciseCategory (exerciseLinkSortedByBodyPart: ExerciseLinkSortedByBodyPart): Promise<SpecificMuscleExerciseLink[]> {
@@ -228,10 +230,6 @@ export default class Exercise extends Vue {
       console.error('Error occurred when saving exercise!', error)
       this.$toast.error(error.message)
     }
-  }
-
-  mounted () {
-    this.loadingContent = true
   }
 }
 </script>

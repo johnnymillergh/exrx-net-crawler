@@ -29,11 +29,11 @@ export const ExerciseRelatedClassificationType = {
   /**
    * Mechanics
    */
-  MECHANICS: new Enum('Mechanics', 1),
+  MECHANICS: new Enum('Mechanics', 2),
   /**
    * Force
    */
-  FORCE: new Enum('Force', 1),
+  FORCE: new Enum('Force', 3),
 
   /**
    * Get array of Exercise Related Classification Type.
