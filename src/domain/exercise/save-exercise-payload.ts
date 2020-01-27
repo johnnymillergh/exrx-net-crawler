@@ -4,14 +4,11 @@ import { ExerciseRelatedClassificationPayload } from '@/domain/exercise/exercise
 
 export class SaveExercisePayload {
   @IsNotEmpty()
-  exerciseGif!: File
+  exerciseName!: string
 
   @ValidateNested()
   @ArrayNotEmpty()
   exerciseRelatedClassificationPayloadList = [] as ExerciseRelatedClassificationPayload[]
-
-  @IsNotEmpty()
-  exerciseName!: string
 
   @IsNotEmpty()
   preparation!: string

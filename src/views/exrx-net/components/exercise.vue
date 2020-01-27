@@ -30,6 +30,7 @@
   </v-card>
 </template>
 
+
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import cheerio from 'cheerio'
@@ -43,6 +44,7 @@ import { HyperlinkUtil } from '@/utils/hyperlink-util'
 import { exerciseApi } from '@/requests/exercise-api'
 import { SaveExercisePayload } from '@/domain/exercise/save-exercise-payload'
 import { ExerciseRelatedClassificationType } from '@/constants/exercise-related-classification-type'
+import { SaveExerciseGifPayload } from '@/domain/exercise/save-exercise-gif-payload'
 
 @Component
 export default class Exercise extends Vue {
@@ -199,13 +201,16 @@ export default class Exercise extends Vue {
         exerciseRelatedClassificationType: ExerciseRelatedClassificationType.UTILITY.value
       })
     })
-    saveExercisePayload.exerciseGif = new File([exerciseGif], HyperlinkUtil.parseFileNameFromUrl(exerciseGifUrl))
     saveExercisePayload.preparation = article.find('p:contains(\'Preparation\')').next().text().trim()
     saveExercisePayload.execution = article.find('p:contains(\'Execution\')').next().text().trim()
     saveExercisePayload.comments = article.find('h2:contains(\'Comments\')').next().text().trim()
+    const saveExerciseGifPayload = new SaveExerciseGifPayload()
+    saveExerciseGifPayload.exerciseGif = new File([exerciseGif], HyperlinkUtil.parseFileNameFromUrl(exerciseGifUrl))
     try {
       const saveExerciseResponse = await exerciseApi.saveExercise(saveExercisePayload)
-      this.$toast.success(saveExerciseResponse.message)
+      saveExerciseGifPayload.exerciseId = saveExerciseResponse.data
+      const saveExerciseGifResponse = await exerciseApi.saveExerciseGif(saveExerciseGifPayload)
+      this.$toast.success(`${saveExerciseResponse.message}; ${saveExerciseGifResponse.message}`)
     } catch (error) {
       console.error('Error occurred when saving exercise!', error)
       this.$toast.error(error.message)
