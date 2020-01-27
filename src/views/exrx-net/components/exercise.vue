@@ -42,6 +42,7 @@ import { SpecificMuscleExerciseLink } from '@/domain/exercise/specific-muscle-ex
 import { HyperlinkUtil } from '@/utils/hyperlink-util'
 import { exerciseApi } from '@/requests/exercise-api'
 import { SaveExercisePayload } from '@/domain/exercise/save-exercise-payload'
+import { ExerciseRelatedClassificationType } from '@/constants/exercise-related-classification-type'
 
 @Component
 export default class Exercise extends Vue {
@@ -175,9 +176,29 @@ export default class Exercise extends Vue {
     const exerciseGifUrl = HyperlinkUtil.restorePathToUrl(exerciseGifDom.attr().src)
     const exerciseGif = await exrxNetApi.getResourceByUrl(exerciseGifUrl, undefined, 'arraybuffer')
     const classification = article.find('h2:contains(\'Classification\')').next()
-    console.info('classification', classification)
+    const utility = classification.find('td:contains(\'Utility:\')').next().text().trim().split(' or ')
+    const mechanics = classification.find('td:contains(\'Mechanics:\')').next().text().trim().split(' or ')
+    const force = classification.find('td:contains(\'Force:\')').next().text().trim().split(' or ')
     const saveExercisePayload = new SaveExercisePayload()
     saveExercisePayload.exerciseName = cheerio.load(response)('h1.page-title').text().trim()
+    utility.forEach(item => {
+      saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
+        classificationName: item,
+        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.UTILITY.value
+      })
+    })
+    mechanics.forEach(item => {
+      saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
+        classificationName: item,
+        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.UTILITY.value
+      })
+    })
+    force.forEach(item => {
+      saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
+        classificationName: item,
+        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.UTILITY.value
+      })
+    })
     saveExercisePayload.exerciseGif = new File([exerciseGif], HyperlinkUtil.parseFileNameFromUrl(exerciseGifUrl))
     saveExercisePayload.preparation = article.find('p:contains(\'Preparation\')').next().text().trim()
     saveExercisePayload.execution = article.find('p:contains(\'Execution\')').next().text().trim()
