@@ -53,8 +53,10 @@ export const ExerciseRelatedClassificationType = {
       }
     })
     if (enumeration.value === -1) {
-      throw new Error(`Status not found! Given code: ${value}.`)
+      throw new Error(`Enum not found! Given code: ${value}.`)
     }
     return enumeration
   }
 }
+
+Object.freeze(ExerciseRelatedClassificationType)
