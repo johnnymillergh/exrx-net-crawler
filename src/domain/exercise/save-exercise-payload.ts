@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { ArrayNotEmpty, IsNotEmpty, ValidateNested } from 'class-validator'
 import { ExerciseRelatedClassificationPayload } from '@/domain/exercise/exercise-related-classification-payload'
+import { ExerciseRelatedMusclePayload } from '@/domain/exercise/exercise-related-muscle-payload'
 
 export class SaveExercisePayload {
   @IsNotEmpty()
@@ -18,4 +19,8 @@ export class SaveExercisePayload {
 
   @IsNotEmpty()
   comments!: string
+
+  @ValidateNested()
+  @ArrayNotEmpty()
+  exerciseRelatedMusclePayloadList = [] as ExerciseRelatedMusclePayload[]
 }

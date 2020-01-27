@@ -35,31 +35,47 @@ export const ExerciseRelatedMuscleType = {
   /**
    * Agonist - a muscle that causes motion.
    */
-  AGONIST: new Enum('Agonist - a muscle that causes motion.', 1),
+  AGONIST: new Enum('Agonist', 1),
   /**
    * Antagonist - a muscle that can move the joint opposite to the movement produced by the agonist.
    */
-  ANTAGONIST: new Enum('Antagonist - a muscle that can move the joint opposite to the movement produced by the agonist.', 2),
+  ANTAGONIST: new Enum('Antagonist', 2),
   /**
    * Target - the primary muscle intended for exercise.
    */
-  TARGET: new Enum('Target - the primary muscle intended for exercise.', 3),
+  TARGET: new Enum('Target', 3),
   /**
    * Synergist - a muscle that assists another muscle to accomplish a movement.
    */
-  SYNERGIST: new Enum('Synergist - a muscle that assists another muscle to accomplish a movement.', 4),
+  SYNERGIST: new Enum('Synergist', 4),
   /**
    * Stabilizer - a muscle that contracts with no significant movement to maintain a posture or fixate a joint.
    */
-  STABILIZER: new Enum('Stabilizer - a muscle that contracts with no significant movement to maintain a posture or fixate a joint.', 5),
+  STABILIZER: new Enum('Stabilizer', 5),
   /**
    * Dynamic Stabilizer - also known as Fixator, occurs during many compound movements.
    */
-  DYNAMIC_STABILIZER: new Enum('Dynamic Stabilizer - also known as Fixator, occurs during many compound movements.', 6),
+  DYNAMIC_STABILIZER: new Enum('Dynamic Stabilizer', 6),
   /**
    * Antagonist Stabilizer - a muscle that contracts to maintain the tension potential of a biarticulate muscle at the adjacent joint.
    */
-  ANTAGONIST_STABILIZER: new Enum('Antagonist Stabilizer - a muscle that contracts to maintain the tension potential of a biarticulate muscle at the adjacent joint.', 7),
+  ANTAGONIST_STABILIZER: new Enum('Antagonist Stabilizer', 7),
+
+  /**
+   * Get array of Exercise Related Muscle Type.
+   * @return {Array} an array of Exercise Related Muscle Type.
+   */
+  getArray: () => {
+    const array = [] as Enum[]
+    Object.keys(ExerciseRelatedMuscleType).forEach(enumKey => {
+      // @ts-ignore
+      if (ExerciseRelatedMuscleType[enumKey] instanceof Enum) {
+        // @ts-ignore
+        array.push(ExerciseRelatedMuscleType[enumKey])
+      }
+    })
+    return array
+  },
 
   /**
    * Get status by value.

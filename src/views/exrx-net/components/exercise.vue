@@ -30,7 +30,6 @@
   </v-card>
 </template>
 
-
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import cheerio from 'cheerio'
@@ -45,6 +44,7 @@ import { exerciseApi } from '@/requests/exercise-api'
 import { SaveExercisePayload } from '@/domain/exercise/save-exercise-payload'
 import { ExerciseRelatedClassificationType } from '@/constants/exercise-related-classification-type'
 import { SaveExerciseGifPayload } from '@/domain/exercise/save-exercise-gif-payload'
+import { ExerciseRelatedMuscleType } from '@/constants/exercise-related-muslce-type'
 
 @Component
 export default class Exercise extends Vue {
@@ -192,18 +192,31 @@ export default class Exercise extends Vue {
     mechanics.forEach(item => {
       saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
         classificationName: item,
-        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.UTILITY.value
+        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.MECHANICS.value
       })
     })
     force.forEach(item => {
       saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
         classificationName: item,
-        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.UTILITY.value
+        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.FORCE.value
       })
     })
     saveExercisePayload.preparation = article.find('p:contains(\'Preparation\')').next().text().trim()
     saveExercisePayload.execution = article.find('p:contains(\'Execution\')').next().text().trim()
     saveExercisePayload.comments = article.find('h2:contains(\'Comments\')').next().text().trim()
+    // parse exercise related muscles
+    ExerciseRelatedMuscleType.getArray().forEach(item => {
+      const relatedMuscles = article.find(`p > a:contains('${item.description}')`).parent().next()
+      if (relatedMuscles.length) {
+        const relatedMuscleList = DomUtil.getFirstLevelTextArray(relatedMuscles)
+        relatedMuscleList.forEach(muscle => {
+          saveExercisePayload.exerciseRelatedMusclePayloadList.push({
+            muscleName: muscle,
+            relatedMuscleType: item.value
+          })
+        })
+      }
+    })
     const saveExerciseGifPayload = new SaveExerciseGifPayload()
     saveExerciseGifPayload.exerciseGif = new File([exerciseGif], HyperlinkUtil.parseFileNameFromUrl(exerciseGifUrl))
     try {

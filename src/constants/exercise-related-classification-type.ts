@@ -36,6 +36,22 @@ export const ExerciseRelatedClassificationType = {
   FORCE: new Enum('Force', 1),
 
   /**
+   * Get array of Exercise Related Classification Type.
+   * @return {Array} an array of Exercise Related Classification Type.
+   */
+  getArray: () => {
+    const array = [] as Enum[]
+    Object.keys(ExerciseRelatedClassificationType).forEach(enumKey => {
+      // @ts-ignore
+      if (ExerciseRelatedClassificationType[enumKey] instanceof Enum) {
+        // @ts-ignore
+        array.push(ExerciseRelatedClassificationType[enumKey])
+      }
+    })
+    return array
+  },
+
+  /**
    * Get status by value.
    * @param value {number} value
    * @throws Enum
