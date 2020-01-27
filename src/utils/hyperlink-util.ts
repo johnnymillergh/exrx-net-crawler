@@ -13,14 +13,11 @@ export class HyperlinkUtil {
     if (validator.isURL(path)) {
       return path
     }
-    if (path.search('../..') === 0) {
-      return path.replace('../..', HyperlinkUtil.baseUrl)
-    }
     const valid = HyperlinkUtil.pathPattern.test(path)
     if (!valid) {
       throw new Error(`Invalid path. Path value: ${path}`)
     }
-    return path.replace(/^(\.{0,2}|\\#)/, HyperlinkUtil.baseUrl)
+    return path.replace(/^(\.{2}\/\.{2}|\.{0,2}|\\#)/, HyperlinkUtil.baseUrl)
   }
 
   /**
