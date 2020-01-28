@@ -180,7 +180,7 @@ export default class Exercise extends Vue {
     const exerciseGifUrl = HyperlinkUtil.restorePathToUrl(exerciseGifDom.attr().src)
     const exerciseGif = await exrxNetApi.getResourceByUrl(exerciseGifUrl, undefined, 'arraybuffer')
     const classification = article.find('h2:contains(\'Classification\')').next()
-    const classificationRegExp = /\s\\&\s|\sor\s/
+    const classificationRegExp = /\s&\s|\sor\s/
     const utility = classification.find('td:contains(\'Utility:\')').next().text().trim().split(classificationRegExp)
     const mechanics = classification.find('td:contains(\'Mechanics:\')').next().text().trim().split(classificationRegExp)
     const force = classification.find('td:contains(\'Force:\')').next().text().trim().split(classificationRegExp)
