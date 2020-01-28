@@ -187,22 +187,28 @@ export default class Exercise extends Vue {
     const saveExercisePayload = new SaveExercisePayload()
     saveExercisePayload.exerciseName = cheerio.load(response)('h1.page-title').text().trim()
     utility.forEach(item => {
-      saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
-        classificationName: item.trim(),
-        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.UTILITY.value
-      })
+      if (item.trim()) {
+        saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
+          classificationName: item.trim(),
+          exerciseRelatedClassificationType: ExerciseRelatedClassificationType.UTILITY.value
+        })
+      }
     })
     mechanics.forEach(item => {
-      saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
-        classificationName: item.trim(),
-        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.MECHANICS.value
-      })
+      if (item.trim()) {
+        saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
+          classificationName: item.trim(),
+          exerciseRelatedClassificationType: ExerciseRelatedClassificationType.MECHANICS.value
+        })
+      }
     })
     force.forEach(item => {
-      saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
-        classificationName: item.trim(),
-        exerciseRelatedClassificationType: ExerciseRelatedClassificationType.FORCE.value
-      })
+      if (item.trim()) {
+        saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
+          classificationName: item.trim(),
+          exerciseRelatedClassificationType: ExerciseRelatedClassificationType.FORCE.value
+        })
+      }
     })
     saveExercisePayload.preparation = article.find('p:contains(\'Preparation\')').next().text().trim()
     saveExercisePayload.execution = article.find('p:contains(\'Execution\')').next().text().trim()
