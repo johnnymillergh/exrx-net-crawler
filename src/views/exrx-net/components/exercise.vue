@@ -180,26 +180,27 @@ export default class Exercise extends Vue {
     const exerciseGifUrl = HyperlinkUtil.restorePathToUrl(exerciseGifDom.attr().src)
     const exerciseGif = await exrxNetApi.getResourceByUrl(exerciseGifUrl, undefined, 'arraybuffer')
     const classification = article.find('h2:contains(\'Classification\')').next()
-    const utility = classification.find('td:contains(\'Utility:\')').next().text().trim().split(' or ')
-    const mechanics = classification.find('td:contains(\'Mechanics:\')').next().text().trim().split(' or ')
-    const force = classification.find('td:contains(\'Force:\')').next().text().trim().split(' or ')
+    const classificationRegExp = /\s\\&\s|\sor\s/
+    const utility = classification.find('td:contains(\'Utility:\')').next().text().trim().split(classificationRegExp)
+    const mechanics = classification.find('td:contains(\'Mechanics:\')').next().text().trim().split(classificationRegExp)
+    const force = classification.find('td:contains(\'Force:\')').next().text().trim().split(classificationRegExp)
     const saveExercisePayload = new SaveExercisePayload()
     saveExercisePayload.exerciseName = cheerio.load(response)('h1.page-title').text().trim()
     utility.forEach(item => {
       saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
-        classificationName: item,
+        classificationName: item.trim(),
         exerciseRelatedClassificationType: ExerciseRelatedClassificationType.UTILITY.value
       })
     })
     mechanics.forEach(item => {
       saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
-        classificationName: item,
+        classificationName: item.trim(),
         exerciseRelatedClassificationType: ExerciseRelatedClassificationType.MECHANICS.value
       })
     })
     force.forEach(item => {
       saveExercisePayload.exerciseRelatedClassificationPayloadList.push({
-        classificationName: item,
+        classificationName: item.trim(),
         exerciseRelatedClassificationType: ExerciseRelatedClassificationType.FORCE.value
       })
     })
@@ -230,6 +231,9 @@ export default class Exercise extends Vue {
       console.error('Error occurred when saving exercise!', error)
       this.$toast.error(error.message)
     }
+  }
+
+  mounted () {
   }
 }
 </script>
