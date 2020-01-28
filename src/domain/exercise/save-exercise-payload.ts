@@ -8,7 +8,6 @@ export class SaveExercisePayload {
   exerciseName!: string
 
   @ValidateNested()
-  @ArrayNotEmpty()
   exerciseRelatedClassificationPayloadList = [] as ExerciseRelatedClassificationPayload[]
 
   @IsNotEmpty()
