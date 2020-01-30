@@ -52,6 +52,7 @@ export default class Exercise extends Vue {
 
   private loadingContent = false
   private loadingSaveExercise = false
+  // noinspection JSUnusedLocalSymbols
   private showExercise = false
   private saveExerciseProgressOfBodyPart = ''
   private saveSpecificExerciseProgress = ''
@@ -239,6 +240,7 @@ export default class Exercise extends Vue {
     }
   }
 
+  // noinspection JSUnusedGlobalSymbols
   mounted () {
   }
 }
