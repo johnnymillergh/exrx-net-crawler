@@ -7,7 +7,7 @@
     <v-layout text-center wrap>
       <v-flex xs12>
         <!--suppress HtmlUnknownTarget -->
-        <v-img :src="require('@/assets/logo.svg')" class="my-3" contain height="200"/>
+        <v-img :src="require('@/assets/exrx-net-crawler-social-image.png')" class="my-3" contain height="400"/>
       </v-flex>
       <v-flex mb-4>
         <h1 class="display-2 font-weight-bold mb-3">Welcome to Exrx Net Crawler</h1>
@@ -15,6 +15,7 @@
         <p>Environment: {{ environment }}</p>
       </v-flex>
     </v-layout>
+    <v-divider style="margin-bottom: 24px"/>
     <v-row>
       <v-btn v-debounced-click="handelClickTest" block color="primary">Test Back-end Service</v-btn>
     </v-row>
@@ -26,8 +27,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AppUtil } from '@/utils/app-util'
-import { GetByIdPayload } from '@/requests/test-table/payload/get-by-id-payload'
-import { testTableApi } from '@/requests/test-table/test-table-api'
+import { GetByIdPayload } from '@/domain/test-table/get-by-id-payload'
+import { testTableApi } from '@/requests/test-table-api'
 
 @Component
 export default class HelloWorld extends Vue {
@@ -38,7 +39,7 @@ export default class HelloWorld extends Vue {
 
   async mounted () {
     this.version = AppUtil.getVersionInfo()
-    this.environment = `Environment: ${process.env.NODE_ENV} (${process.env.VUE_APP_ENV})`
+    this.environment = `${process.env.NODE_ENV} (${process.env.VUE_APP_ENV})`
   }
 
   async handelClickTest (): Promise<void> {
