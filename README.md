@@ -1,18 +1,18 @@
 ![ExRx Net Crawler Feature Graphics](https://raw.githubusercontent.com/johnnymillergh/MaterialLibrary/master/exrx-net-crawler/exrx-net-crawler-social-image.png)
 
-[![GitHub release](https://img.shields.io/github/release/johnnymillergh/vuetify-typescript-playground.svg)](https://github.com/johnnymillergh/vuetify-typescript-playground/releases)
-[![Build Status](https://travis-ci.com/johnnymillergh/vuetify-typescript-playground.svg?branch=master)](https://travis-ci.com/johnnymillergh/typescript-playground)
-[![GitHub issues](https://img.shields.io/github/issues/johnnymillergh/vuetify-typescript-playground)](https://github.com/johnnymillergh/vuetify-typescript-playground/issues)
-[![GitHub forks](https://img.shields.io/github/forks/johnnymillergh/vuetiify-typescript-playground)](https://github.com/johnnymillergh/vuetify-typescript-playground/network)
-[![GitHub stars](https://img.shields.io/github/stars/johnnymillergh/vuetiify-typescript-playground)](https://github.com/johnnymillergh/vuetify-typescript-playground/stargazers)
-[![GitHub license](https://img.shields.io/github/license/johnnymillergh/vuetiify-typescript-playground)](https://github.com/johnnymillergh/vuetify-typescript-playground/blob/master/LICENSE)
-[![Twitter](https://img.shields.io/twitter/url/https/github.com/johnnymillergh/vuetiify-typescript-playground?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fjohnnymillergh%2Fvuetify-typescript-playground)
+[![GitHub release](https://img.shields.io/github/release/johnnymillergh/exrx-net-crawler.svg)](https://github.com/johnnymillergh/exrx-net-crawler/releases)
+[![Build Status](https://travis-ci.com/johnnymillergh/exrx-net-crawler.svg?branch=master)](https://travis-ci.com/johnnymillergh/typescript-playground)
+[![GitHub issues](https://img.shields.io/github/issues/johnnymillergh/exrx-net-crawler)](https://github.com/johnnymillergh/exrx-net-crawler/issues)
+[![GitHub forks](https://img.shields.io/github/forks/johnnymillergh/exrx-net-crawler)](https://github.com/johnnymillergh/exrx-net-crawler/network)
+[![GitHub stars](https://img.shields.io/github/stars/johnnymillergh/exrx-net-crawler)](https://github.com/johnnymillergh/exrx-net-crawler/stargazers)
+[![GitHub license](https://img.shields.io/github/license/johnnymillergh/exrx-net-crawler)](https://github.com/johnnymillergh/exrx-net-crawler/blob/master/LICENSE)
+[![Twitter](https://img.shields.io/twitter/url/https/github.com/johnnymillergh/exrx-net-crawler?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fjohnnymillergh%2Fexrx-net-crawler)
 
 # ExRx.net Crawler
 
-**ExRx.net Crawler** is a Vuetify tutorial project based on TypeScript.
+**ExRx.net Crawler** ExRx.net Crawler is a Vue based crawling project for ExRx.net.
 
-[Official Docker Image](https://hub.docker.com/r/ijohnnymiller/vuetify-typescript-playground-prod)
+[Official Docker Image](https://hub.docker.com/r/ijohnnymiller/exrx-net-crawler-prod)
 
 ## Features
 
@@ -29,6 +29,12 @@ Here is the highlights of **ExRx.net Crawler**:
 9. Support `Dark` / `Light` color scheme. Self-adaptive color scheme change.
 10. Lazy router.
 11. Beatified noscript content.
+
+## Roadmap
+
+- [ ] Correct parsing stretch exercises. Such as: [Neck Retraction Stretch](https://exrx.net/Stretches/Sternocleidomastoid/NeckRetraction), [Neck Rotation Stretch](https://exrx.net/Stretches/Sternocleidomastoid/NeckRotation), etc.
+- [ ] Support inputting or specifying exercise section to parse.
+- [ ] Concurrency requesting and parsing DOMs.
 
 ## Usage
 
@@ -108,7 +114,7 @@ Docker deployment can defer by environment. Here is the list of environments:
 
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/johnnymillergh/typescript-playground/issues/new).
+Feel free to dive in! [Open an issue](https://github.com/johnnymillergh/exrx-net-crawler/issues/new).
 
 ### Contributors
 
@@ -120,11 +126,11 @@ This project exists thanks to all the people who contribute.
 
 ### Sponsors
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](Become a sponsor)]
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://github.com/johnnymillergh)]
 
 ## License
 
-[Apache License](https://github.com/johnnymillergh/typescript-playground/blob/master/LICENSE) © Johnny Miller
+[Apache License](https://github.com/johnnymillergh/exrx-net-crawler/blob/master/LICENSE) © Johnny Miller
 
 2020 - Present
 

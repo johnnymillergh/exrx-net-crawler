@@ -1,17 +1,20 @@
 <template>
   <v-app id="exrx-app">
-    <v-card id="exrx-card" :loading="loadingContent" outlined>
+    <v-card id="exrx-card" outlined>
       <v-card-title>
         <v-icon large left>mdi-file-document</v-icon>
         <span class="title font-weight-light">ExRx.net Document</span>
       </v-card-title>
       <div id="result-container">
-        <v-row>Human Body Parts: {{ bodyPartList }}</v-row>
-        <v-row>
-          <v-btn v-debounced-click="handleClickSaveBodyPart" :loading="loadingSaveBodyPart" color="primary">
-            Save Body Part
-          </v-btn>
-        </v-row>
+        <body-part v-on:exercise-link-list-generated="handleExerciseLinkListGenerated"/>
+        <v-divider class="content-divider"/>
+        <muscle v-on:muscle-link-generated="handelMuscleLinkGenerated"/>
+        <v-divider class="content-divider"/>
+        <muscle-link-view :muscle-link-list="muscleLinkList"/>
+        <v-divider class="content-divider"/>
+        <exercise-classification/>
+        <v-divider class="content-divider"/>
+        <exercise v-bind:exercise-link-sorted-by-body-part-list="exerciseLinkList"/>
       </div>
     </v-card>
   </v-app>
@@ -19,55 +22,35 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { exrxNetApi } from '@/requests/exrx-net-api'
-import cheerio from 'cheerio'
-import { DomUtil } from '@/utils/dom-util'
-import { bodyPartApi } from '@/requests/body-part/body-part-api'
-import { SaveBodyPartPayload } from '@/requests/body-part/payload/save-body-part-payload'
+import BodyPart from './components/body-part.vue'
+import Muscle from './components/muscle.vue'
+import MuscleLinkView from './components/muscle-link.vue'
+// eslint-disable-next-line no-unused-vars
+import { MuscleLink } from '@/domain/muscle/muscle-link'
+// eslint-disable-next-line no-unused-vars
+import { ExerciseLinkSortedByBodyPart } from '@/domain/body-part/exercise-link-sorted-by-body-part'
+import Exercise from '@/views/exrx-net/components/exercise.vue'
+import ExerciseClassification from '@/views/exrx-net/components/exercise-classification.vue'
 
 export default Vue.extend({
   name: 'exrx-net',
+  components: {
+    BodyPart,
+    Muscle,
+    MuscleLinkView,
+    Exercise,
+    ExerciseClassification
+  },
   data: () => ({
-    loadingContent: false,
-    mergedMuscleUnorderedList: {} as Cheerio,
-    bodyPartList: [] as string[],
-    loadingSaveBodyPart: false
+    muscleLinkList: [] as Array<MuscleLink>,
+    exerciseLinkList: [] as ExerciseLinkSortedByBodyPart[]
   }),
   methods: {
-    readMuscle (): void {
-      console.debug('this.mergedMuscleUnorderedList.children()', this.mergedMuscleUnorderedList.children())
-      this.bodyPartList = DomUtil.getFirstLevelTextArray(this.mergedMuscleUnorderedList.children())
+    handelMuscleLinkGenerated (generatedMuscleLinkList: Array<MuscleLink>) {
+      this.muscleLinkList = generatedMuscleLinkList
     },
-    async handleClickSaveBodyPart () {
-      if (!this.bodyPartList.length) {
-        return this.$toast.warning('Invalid data!')
-      }
-      this.loadingSaveBodyPart = true
-      const saveBodyPartPayload = new SaveBodyPartPayload()
-      saveBodyPartPayload.bodyPartNameList = this.bodyPartList
-      try {
-        await bodyPartApi.saveBodyPart(saveBodyPartPayload)
-      } catch (error) {
-        console.error('Error occurred when saving body part!', error)
-        this.$toast.error('Error occurred when saving body part!')
-      } finally {
-        this.loadingSaveBodyPart = false
-      }
-    }
-  },
-  async mounted () {
-    this.loadingContent = true
-    try {
-      const response = await exrxNetApi.exerciseDirectory()
-      this.$toast.success('Succeed to getFirstText extercise directory.')
-      const cheerioInstance = cheerio.load(response)
-      this.mergedMuscleUnorderedList = DomUtil.mergeSameLevelUnorderedList(cheerioInstance('.col-sm-6').find('div > ul'))
-      this.readMuscle()
-    } catch (error) {
-      console.error('Error occurred when sending request `exerciseDirectory`!', error)
-      this.$toast.error('Error occurred when sending request `exerciseDirectory`!')
-    } finally {
-      this.loadingContent = false
+    handleExerciseLinkListGenerated (generatedMuscleLinkList: ExerciseLinkSortedByBodyPart[]) {
+      this.exerciseLinkList = generatedMuscleLinkList
     }
   }
 })
@@ -80,5 +63,10 @@ export default Vue.extend({
 
 #result-container {
   padding: 20px;
+}
+
+.content-divider {
+  margin-top: 12px;
+  margin-bottom: 12px
 }
 </style>

@@ -62,8 +62,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (axiosResponse: AxiosResponse) => {
     // Only the HTTP status code is equal to 200, axios would resolve the promise
-    const data = axiosResponse.data
-    return Promise.resolve(data.data)
+    return Promise.resolve(axiosResponse.data)
   },
   (error: any) => {
     console.error('[IntraAxios] Error occurred when handling response!', error)
@@ -196,6 +195,43 @@ export function legacyPost (url: string, params: any): Promise<any> {
     service.post(url, urlSearchParams)
       .then(resp => {
         resolve(resp)
+      })
+      .catch(rejectedReason => {
+        reject(rejectedReason)
+      })
+  })
+}
+
+// noinspection JSUnusedGlobalSymbols
+/**
+ * Send a POST request with multipart.
+ *
+ * The HTTP POST method sends data to the server. The type of the body of the request is indicated by the Content-Type header.
+ *
+ * @see <a href='https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST'>HTTP request methods — POST | MDN</a>
+ * @param url URL.
+ * @param data data
+ * @return {Promise<any>} Response data.
+ */
+export function postWithMultipart (url: string, data: any): Promise<any> {
+  const objectKeyValueMap = new Map<string, any>(Object.entries(data))
+  const formData = new FormData()
+  objectKeyValueMap.forEach((value, key) => {
+    if (value instanceof Array) {
+      for (const item of value) {
+        formData.append(key, item)
+      }
+    } else {
+      formData.append(key, value)
+    }
+  })
+  const config = {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }
+  return new Promise((resolve, reject) => {
+    service.post(url, formData, config)
+      .then(response => {
+        resolve(response)
       })
       .catch(rejectedReason => {
         reject(rejectedReason)
