@@ -10,7 +10,7 @@
 
 # ExRx.net Crawler
 
-**ExRx.net Crawler** is a Vuetify tutorial project based on TypeScript.
+**ExRx.net Crawler** ExRx.net Crawler is a Vue based crawling project for ExRx.net.
 
 [Official Docker Image](https://hub.docker.com/r/ijohnnymiller/exrx-net-crawler-prod)
 
@@ -29,6 +29,12 @@ Here is the highlights of **ExRx.net Crawler**:
 9. Support `Dark` / `Light` color scheme. Self-adaptive color scheme change.
 10. Lazy router.
 11. Beatified noscript content.
+
+## Roadmap
+
+- [ ] Correct parsing stretch exercises. Such as: [Neck Retraction Stretch](https://exrx.net/Stretches/Sternocleidomastoid/NeckRetraction), [Neck Rotation Stretch](https://exrx.net/Stretches/Sternocleidomastoid/NeckRotation), etc.
+- [ ] Support inputting or specifying exercise section to parse.
+- [ ] Concurrency requesting and parsing DOMs.
 
 ## Usage
 
@@ -108,7 +114,7 @@ Docker deployment can defer by environment. Here is the list of environments:
 
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/johnnymillergh/typescript-playground/issues/new).
+Feel free to dive in! [Open an issue](https://github.com/johnnymillergh/exrx-net-crawler/issues/new).
 
 ### Contributors
 
@@ -120,11 +126,11 @@ This project exists thanks to all the people who contribute.
 
 ### Sponsors
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](Become a sponsor)]
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://github.com/johnnymillergh)]
 
 ## License
 
-[Apache License](https://github.com/johnnymillergh/typescript-playground/blob/master/LICENSE) © Johnny Miller
+[Apache License](https://github.com/johnnymillergh/exrx-net-crawler/blob/master/LICENSE) © Johnny Miller
 
 2020 - Present
 
