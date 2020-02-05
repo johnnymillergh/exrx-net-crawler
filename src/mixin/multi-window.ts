@@ -5,6 +5,12 @@ import { Component, Vue } from 'vue-property-decorator'
  */
 export interface MultiWindowOptions {
   /**
+   * A DOMString specifying the name of the browsing context (window, <iframe> or tab) into which to load the specified resource;
+   * if the name doesn't indicate an existing context, a new window is created and is given the name specified by windowName.
+   */
+  windowTarget?: string
+
+  /**
    * Whether delay closing opened window for 300 ms. Default: true
    */
   delayClosingWindow?: boolean
@@ -59,9 +65,9 @@ export class MultiWindow extends Vue {
       const val = ((multiWindowOptions[key] === null) || (multiWindowOptions[key] === undefined) ? '' : multiWindowOptions[key])
       queryString += queryString === '' ? `?${key}=${val}` : `&${key}=${val}`
     }
-    const newWindow = window.open(`${target}${queryString}`)
+    const newWindow = window.open(`${target}${queryString}`, multiWindowOptions?.windowTarget)
     if (!newWindow) {
-      window.alert('Please give us permission to open new page!')
+      window.alert('Please give us permission to open a new page!')
     } else {
       newWindow.opener.$vue = context
     }
@@ -72,14 +78,14 @@ export class MultiWindow extends Vue {
     const callback = this.$data.$multiWindowOptions.callback
     const delayClosingWindow = this.$data.$multiWindowOptions.delayClosingWindow
     if (!context) {
-      window.alert('Cannot find context!')
+      window.alert('ERROR: Cannot find context!')
       return
     }
     // Check whether opener's callback is valid
     if (callback && typeof context[callback] === 'function') {
       context[callback](argument)
     } else {
-      window.alert('Cannot find callback!')
+      window.alert('ERROR: Cannot find callback!')
       return
     }
     if (delayClosingWindow) {

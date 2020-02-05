@@ -60,7 +60,8 @@ export default class HelloWorld extends Vue {
   handleClickOpenNewPage () {
     this.openWindow(this, '/second-page', {
       callback: 'logCallback',
-      version: 'this.version'
+      windowTarget: 'secondPage',
+      version: this.version
     })
   }
 
