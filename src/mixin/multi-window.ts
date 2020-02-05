@@ -74,7 +74,7 @@ export class MultiWindow extends Vue {
   }
 
   windowBack (argument?: any): void {
-    const context = window.opener.$vue
+    const context = window?.opener?.$vue
     const callback = this.$data.$multiWindowOptions.callback
     const delayClosingWindow = this.$data.$multiWindowOptions.delayClosingWindow
     if (!context) {
