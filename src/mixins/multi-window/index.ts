@@ -1,6 +1,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 // eslint-disable-next-line no-unused-vars
-import { MultiWindowOptions } from '@/mixin/multi-window/multi-window-options'
+import { MultiWindowOptions } from '@/mixins/multi-window/multi-window-options'
 
 /**
  * Multi window mixin
@@ -16,8 +16,8 @@ export class MultiWindow extends Vue {
   }
 
   mounted () {
-    this.$data.$multiWindowOptions.delayClosingWindow = this.$route.query.delayClosingWindow === 'true'
-    this.$data.$multiWindowOptions.callback = this.$route.query.callback
+    this.$data.$multiWindowOptions.delayClosingWindow = this.$route?.query?.delayClosingWindow === 'true'
+    this.$data.$multiWindowOptions.callback = this.$route?.query?.callback
   }
 
   openWindow (context: Vue, url: string, multiWindowOptions?: MultiWindowOptions): void {
