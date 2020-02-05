@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { MultiWindowOptions } from '@/mixin/multi-window'
+import { MultiWindowOptions } from '@/mixin/multi-window/multi-window-options'
 
 declare module 'vue/types/vue' {
   /**
