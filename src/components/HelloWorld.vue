@@ -18,8 +18,10 @@
     <v-divider style="margin-bottom: 24px"/>
     <v-row>
       <v-btn v-debounced-click="handelClickTest" block color="primary">Test Back-end Service</v-btn>
+      <v-btn @click="handleClickOpenNewPage" block>Open New Page</v-btn>
     </v-row>
-    <v-row>{{ response }}</v-row>
+    <v-row>Response: {{ response }}</v-row>
+    <v-row>Value from sub window: {{ JSON.stringify(valueFromSubWindow) }}</v-row>
   </v-container>
 </template>
 
@@ -36,6 +38,7 @@ export default class HelloWorld extends Vue {
   private version = ''
   private environment = ''
   private response = null as any
+  private valueFromSubWindow = null as any
 
   async mounted () {
     this.version = AppUtil.getVersionInfo()
@@ -52,6 +55,18 @@ export default class HelloWorld extends Vue {
       console.error('Error occurred when sending request `getById`!', error)
       this.$toast.error(error.message)
     }
+  }
+
+  handleClickOpenNewPage () {
+    this.openWindow(this, '/second-page', {
+      callback: 'logCallback',
+      version: 'this.version'
+    })
+  }
+
+  logCallback (value: any) {
+    console.info('logCallback', value)
+    this.valueFromSubWindow = value
   }
 }
 </script>

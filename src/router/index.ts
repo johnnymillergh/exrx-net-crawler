@@ -27,6 +27,11 @@ const routes = [
         component: () => import(/* webpackChunkName: "exrx-net" */ '@/views/exrx-net/index.vue')
       }
     ]
+  },
+  {
+    name: 'second-page',
+    path: '/second-page',
+    component: () => import(/* webpackChunkName: "second-page" */ '@/views/second-page/index.vue')
   }
 ]
 
