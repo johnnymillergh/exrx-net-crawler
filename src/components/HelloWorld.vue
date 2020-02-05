@@ -29,8 +29,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { AppUtil } from '@/utils/app-util'
-import { GetByIdPayload } from '@/domain/test-table/get-by-id-payload'
-import { testTableApi } from '@/requests/test-table-api'
+import { commonApi } from '@/requests/common-api'
 
 @Component
 export default class HelloWorld extends Vue {
@@ -46,10 +45,8 @@ export default class HelloWorld extends Vue {
   }
 
   async handelClickTest (): Promise<void> {
-    const getByIdPayload = new GetByIdPayload()
-    getByIdPayload.id = 1
     try {
-      this.response = await testTableApi.getById(getByIdPayload)
+      this.response = await commonApi.appInfo()
       this.$toast.success('Succeed to interact with back-end server `exrx-net-crawler-server`')
     } catch (error) {
       console.error('Error occurred when sending request `getById`!', error)
