@@ -41,12 +41,14 @@ export class MultiWindow extends Vue {
       const val = ((multiWindowOptions[key] === null) || (multiWindowOptions[key] === undefined) ? '' : multiWindowOptions[key])
       queryString += queryString === '' ? `?${key}=${val}` : `&${key}=${val}`
     }
-    const newWindow = window.open(`${target}${queryString}`, multiWindowOptions?.windowTarget)
-    if (!newWindow) {
-      window.alert('Please give us permission to open a new page!')
-    } else {
-      newWindow.opener.$vue = context
-    }
+    setTimeout(() => {
+      const newWindow = window.open(`${target}${queryString}`, multiWindowOptions?.windowTarget)
+      if (!newWindow) {
+        window.alert('Please give us permission to open a new page!')
+      } else {
+        newWindow.opener.$vue = context
+      }
+    }, 600)
   }
 
   windowBack (argument?: any): void {
