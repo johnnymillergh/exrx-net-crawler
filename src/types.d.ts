@@ -18,7 +18,8 @@ declare module 'vue/types/vue' {
     /**
      * Back to last window (close opened window).
      *
-     * You may pass an object back to last window by setting an object argument to MultiWindow.windowBack()
+     * You may pass an object back to last window by setting an object argument to MultiWindow.windowBack().
+     * @throws Error when failing to going back to last page.
      */
     windowBack (argument?: any): void
   }

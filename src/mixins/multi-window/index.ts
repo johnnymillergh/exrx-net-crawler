@@ -55,14 +55,14 @@ export class MultiWindow extends Vue {
     const delayClosingWindow = this.$data.$multiWindowOptions.delayClosingWindow
     if (!context) {
       window.alert('ERROR: Cannot find context!')
-      return
+      throw new Error('Cannot find context!')
     }
     // Check whether opener's callback is valid
     if (callback && typeof context[callback] === 'function') {
       context[callback](argument)
     } else {
       window.alert('ERROR: Cannot find callback!')
-      return
+      throw new Error('Cannot find callback!')
     }
     if (delayClosingWindow) {
       setTimeout(() => {
