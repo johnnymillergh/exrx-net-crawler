@@ -9,6 +9,7 @@ import { ClassValidationUtil } from '@/utils/class-validation-util'
 import * as Cancellation from '@/plugins/axios/cancellation'
 import { HttpStatus } from '@/constants/http-status'
 import { ResponseBody } from '@/plugins/axios/response-body'
+import { AxiosUtil } from '@/utils/axios-util'
 
 // 1. Create an axios instance.
 export const service = Axios.create({
@@ -44,7 +45,7 @@ service.interceptors.request.use(
     Cancellation.cancelAndRemoveSamePendingRequest(axiosRequestConfig)
     // Configure cancelToken for request
     axiosRequestConfig.cancelToken = new Cancellation.CancelToken((cancel: Canceler) => {
-      const requestToken = `${axiosRequestConfig?.url?.split('?')[0]}::${axiosRequestConfig.method}::${JSON.stringify(axiosRequestConfig.params)}`
+      const requestToken = AxiosUtil.getRequestToken(axiosRequestConfig)
       const pendingRequest = new Cancellation.PendingRequest(requestToken, cancel)
       Cancellation.pendingRequestList.push(pendingRequest)
     })

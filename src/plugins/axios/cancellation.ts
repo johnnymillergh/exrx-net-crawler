@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import Axios, { AxiosRequestConfig, Canceler } from 'axios'
+import { AxiosUtil } from '@/utils/axios-util'
 
 export const CancelToken = Axios.CancelToken
 export const pendingRequestList: PendingRequest[] = []
@@ -32,7 +33,7 @@ export class PendingRequest {
 
 export const cancelAndRemoveSamePendingRequest = (axiosRequestConfig: AxiosRequestConfig): void => {
   pendingRequestList.forEach((pendingRequest, index) => {
-    const requestToken = `${axiosRequestConfig?.url?.split('?')[0]}::${axiosRequestConfig.method}::${JSON.stringify(axiosRequestConfig.params)}`
+    const requestToken = AxiosUtil.getRequestToken(axiosRequestConfig)
     if (pendingRequest.requestToken === requestToken) {
       // Execute cancellation of this pending request.
       pendingRequest.cancelExecutor(`Cancelled Axios request. Request token: ${requestToken}`)

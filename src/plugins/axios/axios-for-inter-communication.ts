@@ -6,6 +6,7 @@
 import Axios, { AxiosRequestConfig, AxiosResponse, Canceler, ResponseType } from 'axios'
 import * as Cancellation from '@/plugins/axios/cancellation'
 import { HttpStatus } from '@/constants/http-status'
+import { AxiosUtil } from '@/utils/axios-util'
 
 /**
  CORS Anywhere is a NodeJS reverse proxy which adds CORS headers to the proxied request.
@@ -68,7 +69,7 @@ service.interceptors.request.use(
     Cancellation.cancelAndRemoveSamePendingRequest(axiosRequestConfig)
     // Configure cancelToken for request
     axiosRequestConfig.cancelToken = new Cancellation.CancelToken((cancel: Canceler) => {
-      const requestToken = `${axiosRequestConfig?.url?.split('?')[0]}::${axiosRequestConfig.method}::${JSON.stringify(axiosRequestConfig.params)}`
+      const requestToken = AxiosUtil.getRequestToken(axiosRequestConfig)
       const pendingRequest = new Cancellation.PendingRequest(requestToken, cancel)
       Cancellation.pendingRequestList.push(pendingRequest)
     })
