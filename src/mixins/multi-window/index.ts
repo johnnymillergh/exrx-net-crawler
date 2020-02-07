@@ -45,6 +45,7 @@ export class MultiWindow extends Vue {
       const newWindow = window.open(`${target}${queryString}`, multiWindowOptions?.windowTarget)
       if (!newWindow) {
         window.alert('Please give us permission to open a new page!')
+        throw new Error('Failed to gain permission to open a new page!')
       } else {
         newWindow.opener.$vue = context
       }

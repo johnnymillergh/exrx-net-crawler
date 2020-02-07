@@ -12,6 +12,7 @@ declare module 'vue/types/vue' {
      * @param context opener's Vue instance
      * @param url the page URL to be opened
      * @param multiWindowOptions the parameters to be passed to the opened window
+     * @throws Error when failing to gain permission to open a new page.
      */
     openWindow (context: Vue, url: string, multiWindowOptions?: MultiWindowOptions): void
 
