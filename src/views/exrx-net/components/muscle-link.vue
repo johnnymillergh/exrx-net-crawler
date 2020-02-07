@@ -4,7 +4,10 @@
     <v-card-subtitle>
       <span>Length: {{ muscleLinkList.length }} {{ updateMuscleDetailsProgress }}</span>
     </v-card-subtitle>
-    <v-text-field class="concurrency" v-model="concurrency" type="number" label="Concurrency" required/>
+    <v-form v-model="formValidation">
+      <v-text-field class="concurrency" v-model="concurrency" :rules="rules" type="number" label="Concurrency"
+                    required/>
+    </v-form>
     <v-card-actions>
       <v-btn v-debounced-click="handleClickUpdateMuscleDetails" :loading="loadingUpdateMuscleDetails"
              :disabled="loadingUpdateMuscleDetails" color="primary" text>
@@ -41,7 +44,18 @@ import { muscleApi } from '@/requests/muscle-api'
 export default class MuscleLinkView extends Vue {
   @Prop() private muscleLinkList!: Array<MuscleLink>
 
+  private formValidation = false
   private concurrency = 5
+  private rules = [
+    (value: number) => !!value || 'Concurrency is required.',
+    (value: number) => {
+      if (value <= 0) {
+        return 'Concurrency must be larger than 0.'
+      }
+      return true
+    }
+  ]
+
   private loadingContent = false
   // muscleLinkList: [] as Array<MuscleLink>,
   private loadingUpdateMuscleDetails = false
@@ -118,6 +132,10 @@ export default class MuscleLinkView extends Vue {
   }
 
   async handleClickUpdateMuscleDetails (): Promise<void> {
+    if (!this.formValidation) {
+      this.$toast.warning('Invalid concurrency!')
+      return
+    }
     if (!this?.muscleLinkList.length) {
       this.$toast.warning('Invalid data!')
       return

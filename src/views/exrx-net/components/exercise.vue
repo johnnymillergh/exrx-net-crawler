@@ -7,6 +7,10 @@
       <span>{{ saveSpecificExerciseProgress }}</span>
       <span>{{ saveExerciseProgress }}</span>
     </v-card-subtitle>
+    <v-form v-model="formValidation">
+      <v-text-field class="concurrency" v-model="concurrency" :rules="rules" type="number" label="Concurrency"
+                    required/>
+    </v-form>
     <v-card-actions>
       <v-btn v-debounced-click="handleClickSaveExercise" :loading="loadingSaveExercise" :disabled="loadingSaveExercise"
              color="primary" text>
@@ -51,6 +55,18 @@ export default class Exercise extends Vue {
   @Prop() private exerciseLinkSortedByBodyPartList!: ExerciseLinkSortedByBodyPart[]
 
   private loadingContent = false
+  private formValidation = false
+  private concurrency = 10
+  private rules = [
+    (value: number) => !!value || 'Concurrency is required.',
+    (value: number) => {
+      if (value <= 0) {
+        return 'Concurrency must be larger than 0.'
+      }
+      return true
+    }
+  ]
+
   private loadingSaveExercise = false
   // noinspection JSUnusedLocalSymbols
   private showExercise = false
@@ -69,6 +85,10 @@ export default class Exercise extends Vue {
   }
 
   async handleClickSaveExercise (): Promise<void> {
+    if (!this.formValidation) {
+      this.$toast.warning('Invalid concurrency!')
+      return
+    }
     if (!this.exerciseLinkSortedByBodyPartList || this.exerciseLinkSortedByBodyPartList.length === 0) {
       this.$toast.warning('Invalid data!')
       return
@@ -95,11 +115,22 @@ export default class Exercise extends Vue {
       })
       this.saveSpecificExerciseProgress = `, exercise amount: ${exerciseAmount}`
       for (const item of exercise) {
+        let concurrentExerciseLinkList = []
         // parse and save every specific exercise by exercise link
         for (const link of item.exerciseLinkList) {
           const index = item.exerciseLinkList.indexOf(link)
-          this.saveExerciseProgress = `; ${index + 1}. ${link.exerciseName}`
-          await this.parseSpecificExercise(link)
+          if (index === 0 || index % this.concurrency !== 0) {
+            concurrentExerciseLinkList.push(link)
+          } else {
+            concurrentExerciseLinkList.push(link)
+            console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
+            const tasks = [] as Promise<unknown>[]
+            concurrentExerciseLinkList.forEach(value => {
+              tasks.push(this.parseSpecificExercise(value))
+            })
+            await Promise.all(tasks)
+            concurrentExerciseLinkList = []
+          }
         }
       }
     }
@@ -245,3 +276,10 @@ export default class Exercise extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.concurrency {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+</style>
