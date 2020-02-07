@@ -240,8 +240,8 @@ export default class Exercise extends Vue {
     }
   }
 
-  // noinspection JSUnusedGlobalSymbols
-  mounted () {
+  private mounted () {
+    this.loadingContent = true
   }
 }
 </script>
