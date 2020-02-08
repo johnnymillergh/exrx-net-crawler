@@ -33,13 +33,17 @@ export const service = Axios.create({
 // 2. Request interceptor's configuration.
 service.interceptors.request.use(
   async (axiosRequestConfig: AxiosRequestConfig) => {
-    if (axiosRequestConfig?.params) {
-      const validation = await validate(axiosRequestConfig.params)
-      if (validation.length > 0) {
-        console.error('Validation failed! Validation:', validation)
-        console.error('Validation failed! Error message:', ClassValidationUtil.getAllValidationError(validation))
-        throw new Error(`Validation failed! The 1st error: ${ClassValidationUtil.getFirstValidationError(validation)}`)
-      }
+    let validation = await validate(axiosRequestConfig?.params)
+    if (validation.length > 0) {
+      console.error('Validation failed! Validation:', validation)
+      console.error('Validation failed! Error message:', ClassValidationUtil.getAllValidationError(validation))
+      throw new Error(`Validation failed! The 1st error: ${ClassValidationUtil.getFirstValidationError(validation)}`)
+    }
+    validation = await validate(axiosRequestConfig?.data)
+    if (validation.length > 0) {
+      console.error('Validation failed! Validation:', validation)
+      console.error('Validation failed! Error message:', ClassValidationUtil.getAllValidationError(validation))
+      throw new Error(`Validation failed! The 1st error: ${ClassValidationUtil.getFirstValidationError(validation)}`)
     }
     // Cancel and remove same request before sending upcoming request.
     // Cancellation.cancelAndRemoveSamePendingRequest(axiosRequestConfig)
