@@ -41,7 +41,7 @@
                   <td>{{ item.bodyPartName }}</td>
                   <td>{{ item.link }}</td>
                   <td>
-                    <v-btn>Parse and Save</v-btn>
+                    <v-btn @click="parseAndSaveExerciseByBodyPart(item)">Parse and Save</v-btn>
                   </td>
                 </tr>
               </tbody>
@@ -101,6 +101,10 @@ export default class Exercise extends Vue {
         this.loadingContent = false
       }, 1000)
     }
+  }
+
+  private mounted () {
+    this.loadingContent = true
   }
 
   async handleClickSaveExercise (): Promise<void> {
@@ -171,9 +175,14 @@ export default class Exercise extends Vue {
       const exerciseListItem = exerciseContainerDom.find('li > a')
       exerciseListItem.each((index, element) => {
         const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
-        exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element.attribs.href)
-        exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element)('a').text().trim()
-        specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
+        try {
+          exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element.attribs.href)
+          exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element)('a').text().trim()
+          specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
+        } catch (error) {
+          console.error('Error occurred when iterating exercise!', error)
+          console.error('Error element:', element)
+        }
       })
       result.push(specificMuscleExerciseLink)
       console.info('getAndParseExerciseCategory result', result)
@@ -290,8 +299,9 @@ export default class Exercise extends Vue {
     }
   }
 
-  private mounted () {
-    this.loadingContent = true
+  async parseAndSaveExerciseByBodyPart (exerciseLinkSortedByBodyPart: ExerciseLinkSortedByBodyPart) {
+    const exercise = await this.getAndParseExerciseCategory(exerciseLinkSortedByBodyPart)
+    this.$toast.info(`exercise.length: ${exercise.length}`)
   }
 }
 </script>
