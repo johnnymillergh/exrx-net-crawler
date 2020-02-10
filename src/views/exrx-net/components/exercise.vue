@@ -158,12 +158,13 @@ export default class Exercise extends Vue {
       exerciseAmountList.forEach(item => {
         exerciseAmount += item
       })
-      this.saveSpecificExerciseProgress = `, exercise amount: ${exerciseAmount}`
+      this.saveSpecificExerciseProgress = `, exercise parsing progress: 0 / ${exerciseAmount}`
       for (const item of exercise) {
         let concurrentExerciseLinkList = []
         // parse and save every specific exercise by exercise link
         for (const link of item.exerciseLinkList) {
           const index = item.exerciseLinkList.indexOf(link)
+          this.saveSpecificExerciseProgress = `, exercise parsing progress: ${index + 1} / ${exerciseAmount}`
           if (index === 0 || index % this.concurrency !== 0) {
             concurrentExerciseLinkList.push(link)
           } else {
@@ -322,7 +323,37 @@ export default class Exercise extends Vue {
   }
 
   async parseAndSaveExerciseByBodyPart (exerciseLinkSortedByBodyPart: ExerciseLinkSortedByBodyPart) {
+    this.currentBodyPart = exerciseLinkSortedByBodyPart.bodyPartName ? exerciseLinkSortedByBodyPart.bodyPartName : 'NONE'
     const exercise = await this.getAndParseExerciseCategory(exerciseLinkSortedByBodyPart)
+    this.saveExerciseProgressOfBodyPart = `; parse and save exercise: ${this.currentBodyPart}`
+    const exerciseAmountList = exercise.flatMap(item => {
+      return item.exerciseLinkList.length
+    })
+    let exerciseAmount = 0
+    exerciseAmountList.forEach(item => {
+      exerciseAmount += item
+    })
+    this.saveSpecificExerciseProgress = `, exercise amount: 0 / ${exerciseAmount}`
+    for (const item of exercise) {
+      let concurrentExerciseLinkList = []
+      // parse and save every specific exercise by exercise link
+      for (const link of item.exerciseLinkList) {
+        const index = item.exerciseLinkList.indexOf(link)
+        this.saveSpecificExerciseProgress = `, exercise parsing progress: ${index + 1} / ${exerciseAmount}`
+        if (index === 0 || index % this.concurrency !== 0) {
+          concurrentExerciseLinkList.push(link)
+        } else {
+          concurrentExerciseLinkList.push(link)
+          console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
+          const tasks = [] as Promise<unknown>[]
+          concurrentExerciseLinkList.forEach(value => {
+            tasks.push(this.parseSpecificExercise(value))
+          })
+          await Promise.all(tasks)
+          concurrentExerciseLinkList = []
+        }
+      }
+    }
     console.info('parseAndSaveExerciseByBodyPart', exercise)
   }
 
