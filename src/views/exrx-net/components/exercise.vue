@@ -351,16 +351,18 @@ export default class Exercise extends Vue {
       exerciseAmount += item
     })
     this.saveSpecificExerciseProgress = `, exercise amount: 0 / ${exerciseAmount}`
+    let count = 1
     for (const item of exercise) {
       let concurrentExerciseLinkList = []
       // parse and save every specific exercise by exercise link
       for (const link of item.exerciseLinkList) {
         const index = item.exerciseLinkList.indexOf(link)
-        this.saveSpecificExerciseProgress = `, exercise parsing progress: ${index + 1} / ${exerciseAmount}`
         if (index === 0 || index % this.concurrency !== 0) {
           concurrentExerciseLinkList.push(link)
         } else {
           concurrentExerciseLinkList.push(link)
+          count += this.concurrency
+          this.saveSpecificExerciseProgress = `, exercise parsing progress: ${count} / ${exerciseAmount}`
           console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
           const tasks = [] as Promise<unknown>[]
           concurrentExerciseLinkList.forEach(value => {
