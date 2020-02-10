@@ -313,8 +313,9 @@ export default class Exercise extends Vue {
     saveExercisePayload.comments = article.find('h2:contains(\'Comments\')').next().text().trim()
     // parse exercise related muscles
     ExerciseRelatedMuscleType.getArray().forEach(item => {
-      const relatedMuscles = article.find(`p > a:contains('${item.description}')`).parent().next()
+      let relatedMuscles = article.find(`p > a:contains('${item.description}')`).parent().next()
       if (relatedMuscles.length) {
+        // this is for normal exercise, like https://exrx.net/WeightExercises/Sternocleidomastoid/CBNeckFlx
         const relatedMuscleList = DomUtil.getFirstLevelTextArray(relatedMuscles)
         relatedMuscleList.forEach(muscle => {
           saveExercisePayload.exerciseRelatedMusclePayloadList.push({
@@ -322,6 +323,18 @@ export default class Exercise extends Vue {
             relatedMuscleType: item.value
           })
         })
+      } else {
+        // this is for stretching exercise, like https://exrx.net/Stretches/Sternocleidomastoid/NeckRetraction
+        relatedMuscles = article.find(`p:contains('${item.description}')`).next()
+        if (relatedMuscles.length) {
+          const relatedMuscleList = DomUtil.getFirstLevelTextArray(relatedMuscles)
+          relatedMuscleList.forEach(muscle => {
+            saveExercisePayload.exerciseRelatedMusclePayloadList.push({
+              muscleName: muscle,
+              relatedMuscleType: item.value
+            })
+          })
+        }
       }
     })
     const saveExerciseGifPayload = new SaveExerciseGifPayload()
