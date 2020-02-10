@@ -7,13 +7,18 @@
       <span>{{ saveSpecificExerciseProgress }}</span>
       <span>{{ saveExerciseProgress }}</span>
     </v-card-subtitle>
+    <v-card-title>Concurrency Configuration</v-card-title>
     <v-form ref="concurrencyForm" v-model="concurrencyFormValidation">
       <v-text-field class="input" label="Concurrency" v-model="concurrency" :rules="concurrencyRule" type="number"
                     required/>
     </v-form>
+    <v-card-title>Specific Exercise Link Form</v-card-title>
     <v-form ref="specificExerciseLinkForm" v-model="specificExerciseLinkFormValidation">
+      <v-text-field class="input" label="Exercise Name" v-model="exerciseName"
+                    :rules="exerciseNameRule" required/>
       <v-text-field class="input" label="Specific Exercise Link" v-model="specificExerciseLink"
                     :rules="specificExerciseLinkRule" required/>
+      <v-text-field class="input" label="Equipment Name" v-model="equipmentName" :rules="equipmentRule" required/>
     </v-form>
     <v-card-actions>
       <v-btn v-debounced-click="handleClickSaveExercise" :loading="loadingSaveExercise" :disabled="loadingSaveExercise"
@@ -88,7 +93,9 @@ export default class Exercise extends Vue {
   private concurrencyFormValidation = false
   private specificExerciseLinkFormValidation = false
   private concurrency = 10
+  private exerciseName = ''
   private specificExerciseLink = ''
+  private equipmentName = ''
   private concurrencyRule = [
     (value: number) => !!value || 'Concurrency is required.',
     (value: number) => {
@@ -99,6 +106,10 @@ export default class Exercise extends Vue {
     }
   ]
 
+  private exerciseNameRule = [
+    (value: string) => !!value || 'Exercise name is required.'
+  ]
+
   private specificExerciseLinkRule = [
     (value: string) => !!value || 'Specific exercise link is required.',
     (value: string) => {
@@ -107,6 +118,10 @@ export default class Exercise extends Vue {
       }
       return true
     }
+  ]
+
+  private equipmentRule = [
+    (value: string) => !!value || 'Equipment is required.'
   ]
 
   private loadingSaveExercise = false
@@ -365,7 +380,11 @@ export default class Exercise extends Vue {
       this.$toast.warning('Invalid params!')
       return
     }
-    console.info('this.specificExerciseLinkFormValidation', this.specificExerciseLinkFormValidation)
+    const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
+    exerciseLinkSortedByMuscle.exerciseName = this.exerciseName
+    exerciseLinkSortedByMuscle.link = this.specificExerciseLink
+    exerciseLinkSortedByMuscle.equipmentName = this.equipmentName
+    await this.parseSpecificExercise(exerciseLinkSortedByMuscle)
   }
 }
 </script>
