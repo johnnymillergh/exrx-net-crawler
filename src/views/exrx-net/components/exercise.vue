@@ -323,6 +323,8 @@ export default class Exercise extends Vue {
   }
 
   async parseAndSaveExerciseByBodyPart (exerciseLinkSortedByBodyPart: ExerciseLinkSortedByBodyPart) {
+    this.loadingContent = true
+    this.loadingSaveExercise = true
     this.currentBodyPart = exerciseLinkSortedByBodyPart.bodyPartName ? exerciseLinkSortedByBodyPart.bodyPartName : 'NONE'
     const exercise = await this.getAndParseExerciseCategory(exerciseLinkSortedByBodyPart)
     this.saveExerciseProgressOfBodyPart = `; parse and save exercise: ${this.currentBodyPart}`
@@ -354,7 +356,8 @@ export default class Exercise extends Vue {
         }
       }
     }
-    console.info('parseAndSaveExerciseByBodyPart', exercise)
+    this.loadingContent = false
+    this.loadingSaveExercise = false
   }
 
   async handleClickParseAndSaveSpecificExercise () {
