@@ -192,6 +192,15 @@ export default class Exercise extends Vue {
             await Promise.all(tasks)
             concurrentExerciseLinkList = []
           }
+          if (index === item.exerciseLinkList.length - 1) {
+            console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
+            const tasks = [] as Promise<unknown>[]
+            concurrentExerciseLinkList.forEach(value => {
+              tasks.push(this.parseSpecificExercise(value))
+            })
+            await Promise.all(tasks)
+            concurrentExerciseLinkList = []
+          }
         }
       }
     }
@@ -376,6 +385,15 @@ export default class Exercise extends Vue {
           concurrentExerciseLinkList.push(link)
           count += this.concurrency
           this.saveSpecificExerciseProgress = `, exercise parsing progress: ${count} / ${exerciseAmount}`
+          console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
+          const tasks = [] as Promise<unknown>[]
+          concurrentExerciseLinkList.forEach(value => {
+            tasks.push(this.parseSpecificExercise(value))
+          })
+          await Promise.all(tasks)
+          concurrentExerciseLinkList = []
+        }
+        if (index === item.exerciseLinkList.length - 1) {
           console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
           const tasks = [] as Promise<unknown>[]
           concurrentExerciseLinkList.forEach(value => {
