@@ -26,7 +26,6 @@
         <v-divider/>
         <v-card-text>
           <h3>Exercise Link Sorted By Body Part List</h3>
-          <p>{{ exerciseLinkSortedByBodyPartList }}</p>
           <v-simple-table>
             <template v-slot:default>
               <thead>
@@ -301,7 +300,7 @@ export default class Exercise extends Vue {
 
   async parseAndSaveExerciseByBodyPart (exerciseLinkSortedByBodyPart: ExerciseLinkSortedByBodyPart) {
     const exercise = await this.getAndParseExerciseCategory(exerciseLinkSortedByBodyPart)
-    this.$toast.info(`exercise.length: ${exercise.length}`)
+    console.info('parseAndSaveExerciseByBodyPart', exercise)
   }
 }
 </script>
