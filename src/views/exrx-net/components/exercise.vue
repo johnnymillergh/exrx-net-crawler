@@ -7,14 +7,22 @@
       <span>{{ saveSpecificExerciseProgress }}</span>
       <span>{{ saveExerciseProgress }}</span>
     </v-card-subtitle>
-    <v-form v-model="formValidation">
-      <v-text-field class="concurrency" v-model="concurrency" :rules="rules" type="number" label="Concurrency"
+    <v-form ref="concurrencyForm" v-model="concurrencyFormValidation">
+      <v-text-field class="input" label="Concurrency" v-model="concurrency" :rules="concurrencyRule" type="number"
                     required/>
+    </v-form>
+    <v-form ref="specificExerciseLinkForm" v-model="specificExerciseLinkFormValidation">
+      <v-text-field class="input" label="Specific Exercise Link" v-model="specificExerciseLink"
+                    :rules="specificExerciseLinkRule" required/>
     </v-form>
     <v-card-actions>
       <v-btn v-debounced-click="handleClickSaveExercise" :loading="loadingSaveExercise" :disabled="loadingSaveExercise"
              color="primary" text>
         Save Exercise
+      </v-btn>
+      <v-btn v-debounced-click="handleClickParseAndSaveSpecificExercise" :loading="loadingSaveExercise"
+             :disabled="loadingSaveExercise" color="primary" text>
+        Parse and Save Specific Exercise
       </v-btn>
       <v-spacer/>
       <v-btn icon @click="showExercise = !showExercise">
@@ -67,6 +75,9 @@ import { SaveExercisePayload } from '@/domain/exercise/save-exercise-payload'
 import { ExerciseRelatedClassificationType } from '@/constants/exercise-related-classification-type'
 import { SaveExerciseGifPayload } from '@/domain/exercise/save-exercise-gif-payload'
 import { ExerciseRelatedMuscleType } from '@/constants/exercise-related-muslce-type'
+import validator from 'validator'
+// eslint-disable-next-line no-unused-vars
+import { VForm } from '@/shims-tsx'
 
 @Component
 export default class Exercise extends Vue {
@@ -74,13 +85,25 @@ export default class Exercise extends Vue {
   @Prop() private exerciseLinkSortedByBodyPartList!: ExerciseLinkSortedByBodyPart[]
 
   private loadingContent = false
-  private formValidation = false
+  private concurrencyFormValidation = false
+  private specificExerciseLinkFormValidation = false
   private concurrency = 10
-  private rules = [
+  private specificExerciseLink = ''
+  private concurrencyRule = [
     (value: number) => !!value || 'Concurrency is required.',
     (value: number) => {
       if (value <= 0) {
         return 'Concurrency must be larger than 0.'
+      }
+      return true
+    }
+  ]
+
+  private specificExerciseLinkRule = [
+    (value: string) => !!value || 'Specific exercise link is required.',
+    (value: string) => {
+      if (!validator.isURL(value)) {
+        return 'Invalid URL format.'
       }
       return true
     }
@@ -107,7 +130,7 @@ export default class Exercise extends Vue {
   }
 
   async handleClickSaveExercise (): Promise<void> {
-    if (!this.formValidation) {
+    if (!this.concurrencyFormValidation) {
       this.$toast.warning('Invalid concurrency!')
       return
     }
@@ -302,11 +325,19 @@ export default class Exercise extends Vue {
     const exercise = await this.getAndParseExerciseCategory(exerciseLinkSortedByBodyPart)
     console.info('parseAndSaveExerciseByBodyPart', exercise)
   }
+
+  async handleClickParseAndSaveSpecificExercise () {
+    if (!(this.$refs.specificExerciseLinkForm as VForm).validate()) {
+      this.$toast.warning('Invalid params!')
+      return
+    }
+    console.info('this.specificExerciseLinkFormValidation', this.specificExerciseLinkFormValidation)
+  }
 }
 </script>
 
 <style scoped>
-.concurrency {
+.input {
   margin-left: 16px;
   margin-right: 16px;
 }
