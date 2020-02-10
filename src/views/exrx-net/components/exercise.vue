@@ -27,6 +27,26 @@
         <v-card-text>
           <h3>Exercise Link Sorted By Body Part List</h3>
           <p>{{ exerciseLinkSortedByBodyPartList }}</p>
+          <v-simple-table>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Body Part Name</th>
+                  <th class="text-left">Link</th>
+                  <th class="text-left">Operation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in exerciseLinkSortedByBodyPartList" :key="item.bodyPartName">
+                  <td>{{ item.bodyPartName }}</td>
+                  <td>{{ item.link }}</td>
+                  <td>
+                    <v-btn>Parse and Save</v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
         </v-card-text>
       </div>
     </v-expand-transition>
@@ -68,7 +88,6 @@ export default class Exercise extends Vue {
   ]
 
   private loadingSaveExercise = false
-  // noinspection JSUnusedLocalSymbols
   private showExercise = false
   private saveExerciseProgressOfBodyPart = ''
   private saveSpecificExerciseProgress = ''
