@@ -265,11 +265,15 @@ export default class Exercise extends Vue {
           const exerciseLinkDom = cheerio.load(element1)('a')
           console.info('exerciseLinkDom', exerciseLinkDom)
           exerciseLinkDom.each((index2, element2) => {
-            const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
-            exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element2.attribs.href)
-            exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element2)('a').text().trim()
-            exerciseLinkSortedByMuscle.equipmentName = equipmentName
-            specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
+            try {
+              const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
+              exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element2.attribs.href)
+              exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element2)('a').text().trim()
+              exerciseLinkSortedByMuscle.equipmentName = equipmentName
+              specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
+            } catch (error) {
+              console.error('Error occurred when restoring path to exercise link!', error)
+            }
           })
           console.info('specificMuscleExerciseLink', specificMuscleExerciseLink)
         })
