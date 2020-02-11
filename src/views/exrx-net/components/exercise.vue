@@ -7,10 +7,27 @@
       <span>{{ saveSpecificExerciseProgress }}</span>
       <span>{{ saveExerciseProgress }}</span>
     </v-card-subtitle>
+    <v-card-title>Concurrency Configuration</v-card-title>
+    <v-form ref="concurrencyForm" v-model="concurrencyFormValidation">
+      <v-text-field class="input" label="Concurrency" v-model="concurrency" :rules="concurrencyRule" type="number"
+                    required/>
+    </v-form>
+    <v-card-title>Specific Exercise Link Form</v-card-title>
+    <v-form ref="specificExerciseLinkForm" v-model="specificExerciseLinkFormValidation">
+      <v-text-field class="input" label="Exercise Name" v-model="exerciseName"
+                    :rules="exerciseNameRule" required/>
+      <v-text-field class="input" label="Specific Exercise Link" v-model="specificExerciseLink"
+                    :rules="specificExerciseLinkRule" required/>
+      <v-text-field class="input" label="Equipment Name" v-model="equipmentName" :rules="equipmentRule" required/>
+    </v-form>
     <v-card-actions>
       <v-btn v-debounced-click="handleClickSaveExercise" :loading="loadingSaveExercise" :disabled="loadingSaveExercise"
              color="primary" text>
         Save Exercise
+      </v-btn>
+      <v-btn v-debounced-click="handleClickParseAndSaveSpecificExercise" :loading="loadingSaveExercise"
+             :disabled="loadingSaveExercise" color="primary" text>
+        Parse and Save Specific Exercise
       </v-btn>
       <v-spacer/>
       <v-btn icon @click="showExercise = !showExercise">
@@ -22,7 +39,26 @@
         <v-divider/>
         <v-card-text>
           <h3>Exercise Link Sorted By Body Part List</h3>
-          <p>{{ exerciseLinkSortedByBodyPartList }}</p>
+          <v-simple-table>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">Body Part Name</th>
+                  <th class="text-left">Link</th>
+                  <th class="text-left">Operation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in exerciseLinkSortedByBodyPartList" :key="item.bodyPartName">
+                  <td>{{ item.bodyPartName }}</td>
+                  <td>{{ item.link }}</td>
+                  <td>
+                    <v-btn @click="parseAndSaveExerciseByBodyPart(item)">Parse and Save</v-btn>
+                  </td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
         </v-card-text>
       </div>
     </v-expand-transition>
@@ -44,6 +80,9 @@ import { SaveExercisePayload } from '@/domain/exercise/save-exercise-payload'
 import { ExerciseRelatedClassificationType } from '@/constants/exercise-related-classification-type'
 import { SaveExerciseGifPayload } from '@/domain/exercise/save-exercise-gif-payload'
 import { ExerciseRelatedMuscleType } from '@/constants/exercise-related-muslce-type'
+import validator from 'validator'
+// eslint-disable-next-line no-unused-vars
+import { VForm } from '@/shims-tsx'
 
 @Component
 export default class Exercise extends Vue {
@@ -51,8 +90,41 @@ export default class Exercise extends Vue {
   @Prop() private exerciseLinkSortedByBodyPartList!: ExerciseLinkSortedByBodyPart[]
 
   private loadingContent = false
+  private concurrencyFormValidation = false
+  private specificExerciseLinkFormValidation = false
+  private concurrency = 10
+  private exerciseName = ''
+  private specificExerciseLink = ''
+  private equipmentName = ''
+  private concurrencyRule = [
+    (value: number) => !!value || 'Concurrency is required.',
+    (value: number) => {
+      if (value <= 0) {
+        return 'Concurrency must be larger than 0.'
+      }
+      return true
+    }
+  ]
+
+  private exerciseNameRule = [
+    (value: string) => !!value || 'Exercise name is required.'
+  ]
+
+  private specificExerciseLinkRule = [
+    (value: string) => !!value || 'Specific exercise link is required.',
+    (value: string) => {
+      if (!validator.isURL(value)) {
+        return 'Invalid URL format.'
+      }
+      return true
+    }
+  ]
+
+  private equipmentRule = [
+    (value: string) => !!value || 'Equipment is required.'
+  ]
+
   private loadingSaveExercise = false
-  // noinspection JSUnusedLocalSymbols
   private showExercise = false
   private saveExerciseProgressOfBodyPart = ''
   private saveSpecificExerciseProgress = ''
@@ -68,7 +140,15 @@ export default class Exercise extends Vue {
     }
   }
 
+  private mounted () {
+    this.loadingContent = true
+  }
+
   async handleClickSaveExercise (): Promise<void> {
+    if (!this.concurrencyFormValidation) {
+      this.$toast.warning('Invalid concurrency!')
+      return
+    }
     if (!this.exerciseLinkSortedByBodyPartList || this.exerciseLinkSortedByBodyPartList.length === 0) {
       this.$toast.warning('Invalid data!')
       return
@@ -93,13 +173,34 @@ export default class Exercise extends Vue {
       exerciseAmountList.forEach(item => {
         exerciseAmount += item
       })
-      this.saveSpecificExerciseProgress = `, exercise amount: ${exerciseAmount}`
+      this.saveSpecificExerciseProgress = `, exercise parsing progress: 0 / ${exerciseAmount}`
       for (const item of exercise) {
+        let concurrentExerciseLinkList = []
         // parse and save every specific exercise by exercise link
         for (const link of item.exerciseLinkList) {
           const index = item.exerciseLinkList.indexOf(link)
-          this.saveExerciseProgress = `; ${index + 1}. ${link.exerciseName}`
-          await this.parseSpecificExercise(link)
+          this.saveSpecificExerciseProgress = `, exercise parsing progress: ${index + 1} / ${exerciseAmount}`
+          if (index === 0 || index % this.concurrency !== 0) {
+            concurrentExerciseLinkList.push(link)
+          } else {
+            concurrentExerciseLinkList.push(link)
+            console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
+            const tasks = [] as Promise<unknown>[]
+            concurrentExerciseLinkList.forEach(value => {
+              tasks.push(this.parseSpecificExercise(value))
+            })
+            await Promise.all(tasks)
+            concurrentExerciseLinkList = []
+          }
+          if (index === item.exerciseLinkList.length - 1) {
+            console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
+            const tasks = [] as Promise<unknown>[]
+            concurrentExerciseLinkList.forEach(value => {
+              tasks.push(this.parseSpecificExercise(value))
+            })
+            await Promise.all(tasks)
+            concurrentExerciseLinkList = []
+          }
         }
       }
     }
@@ -121,9 +222,14 @@ export default class Exercise extends Vue {
       const exerciseListItem = exerciseContainerDom.find('li > a')
       exerciseListItem.each((index, element) => {
         const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
-        exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element.attribs.href)
-        exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element)('a').text().trim()
-        specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
+        try {
+          exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element.attribs.href)
+          exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element)('a').text().trim()
+          specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
+        } catch (error) {
+          console.error('Error occurred when iterating exercise!', error)
+          console.error('Error element:', element)
+        }
       })
       result.push(specificMuscleExerciseLink)
       console.info('getAndParseExerciseCategory result', result)
@@ -159,11 +265,15 @@ export default class Exercise extends Vue {
           const exerciseLinkDom = cheerio.load(element1)('a')
           console.info('exerciseLinkDom', exerciseLinkDom)
           exerciseLinkDom.each((index2, element2) => {
-            const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
-            exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element2.attribs.href)
-            exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element2)('a').text().trim()
-            exerciseLinkSortedByMuscle.equipmentName = equipmentName
-            specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
+            try {
+              const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
+              exerciseLinkSortedByMuscle.link = HyperlinkUtil.restorePathToUrl(element2.attribs.href)
+              exerciseLinkSortedByMuscle.exerciseName = cheerio.load(element2)('a').text().trim()
+              exerciseLinkSortedByMuscle.equipmentName = equipmentName
+              specificMuscleExerciseLink.exerciseLinkList.push(exerciseLinkSortedByMuscle)
+            } catch (error) {
+              console.error('Error occurred when restoring path to exercise link!', error)
+            }
           })
           console.info('specificMuscleExerciseLink', specificMuscleExerciseLink)
         })
@@ -216,8 +326,9 @@ export default class Exercise extends Vue {
     saveExercisePayload.comments = article.find('h2:contains(\'Comments\')').next().text().trim()
     // parse exercise related muscles
     ExerciseRelatedMuscleType.getArray().forEach(item => {
-      const relatedMuscles = article.find(`p > a:contains('${item.description}')`).parent().next()
+      let relatedMuscles = article.find(`p > a:contains('${item.description}')`).parent().next()
       if (relatedMuscles.length) {
+        // this is for normal exercise, like https://exrx.net/WeightExercises/Sternocleidomastoid/CBNeckFlx
         const relatedMuscleList = DomUtil.getFirstLevelTextArray(relatedMuscles)
         relatedMuscleList.forEach(muscle => {
           saveExercisePayload.exerciseRelatedMusclePayloadList.push({
@@ -225,6 +336,18 @@ export default class Exercise extends Vue {
             relatedMuscleType: item.value
           })
         })
+      } else {
+        // this is for stretching exercise, like https://exrx.net/Stretches/Sternocleidomastoid/NeckRetraction
+        relatedMuscles = article.find(`p:contains('${item.description}')`).next()
+        if (relatedMuscles.length) {
+          const relatedMuscleList = DomUtil.getFirstLevelTextArray(relatedMuscles)
+          relatedMuscleList.forEach(muscle => {
+            saveExercisePayload.exerciseRelatedMusclePayloadList.push({
+              muscleName: muscle,
+              relatedMuscleType: item.value
+            })
+          })
+        }
       }
     })
     const saveExerciseGifPayload = new SaveExerciseGifPayload()
@@ -240,8 +363,72 @@ export default class Exercise extends Vue {
     }
   }
 
-  // noinspection JSUnusedGlobalSymbols
-  mounted () {
+  async parseAndSaveExerciseByBodyPart (exerciseLinkSortedByBodyPart: ExerciseLinkSortedByBodyPart) {
+    this.loadingContent = true
+    this.loadingSaveExercise = true
+    this.currentBodyPart = exerciseLinkSortedByBodyPart.bodyPartName ? exerciseLinkSortedByBodyPart.bodyPartName : 'NONE'
+    const exercise = await this.getAndParseExerciseCategory(exerciseLinkSortedByBodyPart)
+    this.saveExerciseProgressOfBodyPart = `; parse and save exercise: ${this.currentBodyPart}`
+    const exerciseAmountList = exercise.flatMap(item => {
+      return item.exerciseLinkList.length
+    })
+    let exerciseAmount = 0
+    exerciseAmountList.forEach(item => {
+      exerciseAmount += item
+    })
+    this.saveSpecificExerciseProgress = `, exercise amount: 0 / ${exerciseAmount}`
+    let count = 1
+    for (const item of exercise) {
+      let concurrentExerciseLinkList = []
+      // parse and save every specific exercise by exercise link
+      for (const link of item.exerciseLinkList) {
+        const index = item.exerciseLinkList.indexOf(link)
+        if (index === 0 || index % this.concurrency !== 0) {
+          concurrentExerciseLinkList.push(link)
+        } else {
+          concurrentExerciseLinkList.push(link)
+          count += this.concurrency
+          this.saveSpecificExerciseProgress = `, exercise parsing progress: ${count} / ${exerciseAmount}`
+          console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
+          const tasks = [] as Promise<unknown>[]
+          concurrentExerciseLinkList.forEach(value => {
+            tasks.push(this.parseSpecificExercise(value))
+          })
+          await Promise.all(tasks)
+          concurrentExerciseLinkList = []
+        }
+        if (index === item.exerciseLinkList.length - 1) {
+          console.info(`concurrentExerciseLinkList ${index}`, concurrentExerciseLinkList)
+          const tasks = [] as Promise<unknown>[]
+          concurrentExerciseLinkList.forEach(value => {
+            tasks.push(this.parseSpecificExercise(value))
+          })
+          await Promise.all(tasks)
+          concurrentExerciseLinkList = []
+        }
+      }
+    }
+    this.loadingContent = false
+    this.loadingSaveExercise = false
+  }
+
+  async handleClickParseAndSaveSpecificExercise () {
+    if (!(this.$refs.specificExerciseLinkForm as VForm).validate()) {
+      this.$toast.warning('Invalid params!')
+      return
+    }
+    const exerciseLinkSortedByMuscle = new ExerciseLinkSortedByMuscle()
+    exerciseLinkSortedByMuscle.exerciseName = this.exerciseName
+    exerciseLinkSortedByMuscle.link = this.specificExerciseLink
+    exerciseLinkSortedByMuscle.equipmentName = this.equipmentName
+    await this.parseSpecificExercise(exerciseLinkSortedByMuscle)
   }
 }
 </script>
+
+<style scoped>
+.input {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+</style>
