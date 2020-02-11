@@ -32,9 +32,9 @@ Here is the highlights of **ExRx.net Crawler**:
 
 ## Roadmap
 
-- [ ] Correct parsing stretch exercises. Such as: [Neck Retraction Stretch](https://exrx.net/Stretches/Sternocleidomastoid/NeckRetraction), [Neck Rotation Stretch](https://exrx.net/Stretches/Sternocleidomastoid/NeckRotation), etc.
-- [ ] Support inputting or specifying exercise section to parse.
-- [ ] Concurrency requesting and parsing DOMs.
+- [x] Correct parsing stretch exercises. Such as: [Neck Retraction Stretch](https://exrx.net/Stretches/Sternocleidomastoid/NeckRetraction), [Neck Rotation Stretch](https://exrx.net/Stretches/Sternocleidomastoid/NeckRotation), etc.
+- [x] Support inputting or specifying exercise section to parse.
+- [x] Concurrency requesting and parsing DOMs.
 
 ## Usage
 
