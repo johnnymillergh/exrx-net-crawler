@@ -3,9 +3,10 @@
  * @date 1/2/20 9:15 AM
  */
 // eslint-disable-next-line no-unused-vars
-import Axios, { AxiosRequestConfig, AxiosResponse, Canceler, ResponseType } from 'axios'
-import * as Cancellation from '@/plugins/axios/cancellation'
+import Axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios'
+// import * as Cancellation from '@/plugins/axios/cancellation'
 import { HttpStatus } from '@/constants/http-status'
+// import { AxiosUtil } from '@/utils/axios-util'
 
 /**
  CORS Anywhere is a NodeJS reverse proxy which adds CORS headers to the proxied request.
@@ -65,13 +66,13 @@ export const service = Axios.create({
 service.interceptors.request.use(
   async (axiosRequestConfig: AxiosRequestConfig) => {
     // Cancel and remove same request before sending upcoming request.
-    Cancellation.cancelAndRemoveSamePendingRequest(axiosRequestConfig)
+    // Cancellation.cancelAndRemoveSamePendingRequest(axiosRequestConfig)
     // Configure cancelToken for request
-    axiosRequestConfig.cancelToken = new Cancellation.CancelToken((cancel: Canceler) => {
-      const requestToken = `${axiosRequestConfig?.url?.split('?')[0]}::${axiosRequestConfig.method}::${JSON.stringify(axiosRequestConfig.params)}`
-      const pendingRequest = new Cancellation.PendingRequest(requestToken, cancel)
-      Cancellation.pendingRequestList.push(pendingRequest)
-    })
+    // axiosRequestConfig.cancelToken = new Cancellation.CancelToken((cancel: Canceler) => {
+    //   const requestToken = AxiosUtil.getRequestToken(axiosRequestConfig)
+    //   const pendingRequest = new Cancellation.PendingRequest(requestToken, cancel)
+    //   Cancellation.pendingRequestList.push(pendingRequest)
+    // })
     return axiosRequestConfig
   },
   (error: any) => {

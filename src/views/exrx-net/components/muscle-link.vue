@@ -4,6 +4,10 @@
     <v-card-subtitle>
       <span>Length: {{ muscleLinkList.length }} {{ updateMuscleDetailsProgress }}</span>
     </v-card-subtitle>
+    <v-form v-model="formValidation">
+      <v-text-field class="concurrency" v-model="concurrency" :rules="rules" type="number" label="Concurrency"
+                    required/>
+    </v-form>
     <v-card-actions>
       <v-btn v-debounced-click="handleClickUpdateMuscleDetails" :loading="loadingUpdateMuscleDetails"
              :disabled="loadingUpdateMuscleDetails" color="primary" text>
@@ -39,6 +43,18 @@ import { muscleApi } from '@/requests/muscle-api'
 @Component
 export default class MuscleLinkView extends Vue {
   @Prop() private muscleLinkList!: Array<MuscleLink>
+
+  private formValidation = false
+  private concurrency = 5
+  private rules = [
+    (value: number) => !!value || 'Concurrency is required.',
+    (value: number) => {
+      if (value <= 0) {
+        return 'Concurrency must be larger than 0.'
+      }
+      return true
+    }
+  ]
 
   private loadingContent = false
   // muscleLinkList: [] as Array<MuscleLink>,
@@ -116,17 +132,31 @@ export default class MuscleLinkView extends Vue {
   }
 
   async handleClickUpdateMuscleDetails (): Promise<void> {
+    if (!this.formValidation) {
+      this.$toast.warning('Invalid concurrency!')
+      return
+    }
     if (!this?.muscleLinkList.length) {
       this.$toast.warning('Invalid data!')
       return
     }
     this.loadingUpdateMuscleDetails = true
     try {
+      let concurrentMuscleLinkList = []
       for (const item of this.muscleLinkList) {
         const index = this.muscleLinkList.indexOf(item)
-        this.updateMuscleDetailsProgress = `Updating muscle. Progress: ${index + 1} of ${this.muscleLinkList.length}`
-        console.info(`muscleLink ${index}`, item)
-        await this.timeoutHandler(item)
+        if (index === 0 || index % this.concurrency !== 0) {
+          concurrentMuscleLinkList.push(item)
+        } else {
+          concurrentMuscleLinkList.push(item)
+          console.info(`concurrentMuscleLinkList ${index}`, concurrentMuscleLinkList)
+          const tasks = [] as Promise<unknown>[]
+          concurrentMuscleLinkList.forEach(value => {
+            tasks.push(this.timeoutHandler(value))
+          })
+          await Promise.all(tasks)
+          concurrentMuscleLinkList = []
+        }
       }
     } catch (error) {
       console.error('Error occurred when updating muscle details!', error)
@@ -141,3 +171,10 @@ export default class MuscleLinkView extends Vue {
   }
 }
 </script>
+
+<style scoped>
+.concurrency {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+</style>

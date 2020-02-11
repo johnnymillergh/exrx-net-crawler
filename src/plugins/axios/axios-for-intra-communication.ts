@@ -3,12 +3,13 @@
  * @date 1/2/20 9:15 AM
  */
 // eslint-disable-next-line no-unused-vars
-import Axios, { AxiosRequestConfig, AxiosResponse, Canceler, ResponseType } from 'axios'
+import Axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios'
 import { validate } from 'class-validator'
 import { ClassValidationUtil } from '@/utils/class-validation-util'
-import * as Cancellation from '@/plugins/axios/cancellation'
+// import * as Cancellation from '@/plugins/axios/cancellation'
 import { HttpStatus } from '@/constants/http-status'
 import { ResponseBody } from '@/plugins/axios/response-body'
+// import { AxiosUtil } from '@/utils/axios-util'
 
 // 1. Create an axios instance.
 export const service = Axios.create({
@@ -35,19 +36,27 @@ service.interceptors.request.use(
     if (axiosRequestConfig?.params) {
       const validation = await validate(axiosRequestConfig.params)
       if (validation.length > 0) {
-        console.error('Validation failed! Validation:', validation)
-        console.error('Validation failed! Error message:', ClassValidationUtil.getAllValidationError(validation))
-        throw new Error(`Validation failed! The 1st error: ${ClassValidationUtil.getFirstValidationError(validation)}`)
+        console.error('Params validation failed! Validation:', validation)
+        console.error('Params validation failed! Error message:', ClassValidationUtil.getAllValidationError(validation))
+        throw new Error(`Params validation failed! The 1st error: ${ClassValidationUtil.getFirstValidationError(validation)}`)
+      }
+    }
+    if (axiosRequestConfig?.data) {
+      const validation = await validate(axiosRequestConfig.data)
+      if (validation.length > 0) {
+        console.error('Data validation failed! Validation:', validation)
+        console.error('Data validation failed! Error message:', ClassValidationUtil.getAllValidationError(validation))
+        throw new Error(`Data validation failed! The 1st error: ${ClassValidationUtil.getFirstValidationError(validation)}`)
       }
     }
     // Cancel and remove same request before sending upcoming request.
-    Cancellation.cancelAndRemoveSamePendingRequest(axiosRequestConfig)
+    // Cancellation.cancelAndRemoveSamePendingRequest(axiosRequestConfig)
     // Configure cancelToken for request
-    axiosRequestConfig.cancelToken = new Cancellation.CancelToken((cancel: Canceler) => {
-      const requestToken = `${axiosRequestConfig?.url?.split('?')[0]}::${axiosRequestConfig.method}::${JSON.stringify(axiosRequestConfig.params)}`
-      const pendingRequest = new Cancellation.PendingRequest(requestToken, cancel)
-      Cancellation.pendingRequestList.push(pendingRequest)
-    })
+    // axiosRequestConfig.cancelToken = new Cancellation.CancelToken((cancel: Canceler) => {
+    //   const requestToken = AxiosUtil.getRequestToken(axiosRequestConfig)
+    //   const pendingRequest = new Cancellation.PendingRequest(requestToken, cancel)
+    //   Cancellation.pendingRequestList.push(pendingRequest)
+    // })
     return axiosRequestConfig
   },
   (error: any) => {
