@@ -1,3 +1,18 @@
+## [1.1.1](https://github.com/johnnymillergh/exrx-net-crawler/compare/v1.1.0...v1.1.1) (2020-02-12)
+
+
+### Bug Fixes
+
+* **$Env:** delete whitespace ([e2e1312](https://github.com/johnnymillergh/exrx-net-crawler/commit/e2e13123ee4aff5dbc27ed39800e6e83afa5196f))
+
+
+### Performance Improvements
+
+* **$Docker:** update back-end server IP ([96ab126](https://github.com/johnnymillergh/exrx-net-crawler/commit/96ab1265297e19a4f1e14eb1f079320455bb44b1))
+* **$Env:** abstract ENV variables ([4055a36](https://github.com/johnnymillergh/exrx-net-crawler/commit/4055a369dfa0cb93bbcdce3063d34c51defc84ed))
+
+
+
 # [1.1.0](https://github.com/johnnymillergh/exrx-net-crawler/compare/v1.0.2...v1.1.0) (2020-02-11)
 
 
