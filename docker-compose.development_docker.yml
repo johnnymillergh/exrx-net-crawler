@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   exrx-net-crawler:
-    container_name: exrx-net-crawler
+    container_name: exrx-net-crawler-dev_dkr
     image: "ijohnnymiller/exrx-net-crawler-dev_dkr:${TAG}"
     build:
       dockerfile: Dockerfile
