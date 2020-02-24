@@ -1,4 +1,3 @@
-import validator from "validator"
 <template>
   <v-card :loading="loadingContent">
     <v-card-title>Human Body Part List</v-card-title>
